@@ -6,7 +6,7 @@ class BBSPoster:
     def __init__(self, session, base_url):
         self.session = session
         self.base_url = base_url.rstrip('/')
-        self.api_base = self.base_url  # API 根地址与 base_url 相同（例如 https://mbbs.zdjl.site/mk48by049.mbbs.cc）
+        self.api_base = self.base_url
         # 添加必需的 mbbs-domain 头
         self.session.headers.update({
             'mbbs-domain': 'mk48by049.mbbs.cc'
@@ -113,13 +113,13 @@ class BBSPoster:
             response = self.session.get(self.list_posts_url, headers=headers, params=params, timeout=15)
             if response.status_code == 200:
                 result = response.json()
-                if result.get('success') is True:
+                if isinstance(result, dict) and result.get('success') is True:
                     posts = result.get('data', [])
-                    # 过滤掉帖子本身（通常 is_first 为 True 的是帖子）
+                    # 过滤掉帖子本身（is_first 为 True 的是帖子）
                     comments = [post for post in posts if not post.get('is_first', True)]
                     return comments
                 else:
-                    print(f"[失败] 获取评论失败: {result.get('message')}")
+                    print(f"[失败] 获取评论失败: {result.get('message') if isinstance(result, dict) else '未知错误'}")
                     return []
             else:
                 print(f"[错误] 获取评论HTTP错误: {response.status_code}")
@@ -140,8 +140,20 @@ class BBSPoster:
             response = self.session.get(self.list_comments_replies_url, headers=headers, params=params, timeout=15)
             if response.status_code == 200:
                 result = response.json()
-                if result.get('success') is True:
-                    return result.get('data', {}).get('list', [])
+                # 处理多种可能的返回格式
+                if isinstance(result, list):
+                    return result
+                elif isinstance(result, dict):
+                    if result.get('success') is True:
+                        data = result.get('data', {})
+                        if isinstance(data, list):
+                            return data
+                        elif isinstance(data, dict):
+                            return data.get('list', [])
+                        else:
+                            return []
+                    else:
+                        return []
                 else:
                     return []
             else:
@@ -206,6 +218,19 @@ class BBSPoster:
             return response.status_code == 200
         except Exception as e:
             print(f"[异常] 删除帖子失败: {e}")
+            return False
+
+    def delete_thread_admin(self, thread_id, mk49_token):
+        """通过游戏管理后台删除帖子（需要管理员 mk49_token）"""
+        try:
+            url = f"https://forum.mk49.cyou/admin/thread/{thread_id}?mk49Token={mk49_token}"
+            response = self.session.delete(url, timeout=15)
+            if response.status_code == 200:
+                result = response.json()
+                return result.get('success', False)
+            return False
+        except Exception as e:
+            print(f"[异常] 管理员删帖失败: {e}")
             return False
 
     def batch_delete_threads(self, token, thread_ids):
