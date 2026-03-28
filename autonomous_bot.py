@@ -1,4 +1,3 @@
-# autonomous_bot.py
 import os
 import json
 import time
@@ -61,28 +60,33 @@ class AutonomousBot:
         return default
 
     def _load_state(self):
+        """加载状态文件，自动补充缺失字段"""
+        default = {
+            "processed_threads": [],
+            "processed_posts": [],
+            "action_logs": [],
+            "daily_stats": {},
+            "last_run": None
+        }
         if os.path.exists(self.state_file):
             with open(self.state_file, 'r', encoding='utf-8') as f:
                 state = json.load(f)
             # 确保所有必需的键存在
-            if "daily_stats" not in state:
-                state["daily_stats"] = {}
-            if "processed_threads" not in state:
-                state["processed_threads"] = []
-            if "processed_posts" not in state:
-                state["processed_posts"] = []
-            if "action_logs" not in state:
-                state["action_logs"] = []
+            for key, value in default.items():
+                if key not in state:
+                    state[key] = value
+            # 强制所有ID为整数
+            if "processed_threads" in state:
+                state["processed_threads"] = [int(x) for x in state["processed_threads"]]
+            if "processed_posts" in state:
+                state["processed_posts"] = [int(x) for x in state["processed_posts"]]
             return state
         else:
-            return {
-                "processed_threads": [],
-                "processed_posts": [],
-                "action_logs": [],
-                "daily_stats": {}
-            }
+            return default
 
     def _save_state(self):
+        """保存状态，强制更新 last_run 时间戳"""
+        self.state["last_run"] = datetime.now().isoformat()
         with open(self.state_file, 'w', encoding='utf-8') as f:
             json.dump(self.state, f, indent=2, ensure_ascii=False)
 
@@ -153,7 +157,8 @@ class AutonomousBot:
             if not isinstance(threads, list):
                 continue
             for t in threads:
-                if t.get('id') not in self.state['processed_threads']:
+                tid = int(t.get('id'))
+                if tid not in self.state['processed_threads']:
                     new_threads.append(t)
         return new_threads
 
@@ -164,11 +169,13 @@ class AutonomousBot:
         if not isinstance(posts, list):
             return []
         for p in posts:
-            if p.get('id') not in self.state['processed_posts']:
+            pid = int(p.get('id'))
+            if pid not in self.state['processed_posts']:
                 new_posts.append(p)
-            replies = self.poster.get_comment_replies(self.token, p['id'])
+            replies = self.poster.get_comment_replies(self.token, pid)
             for r in replies:
-                if r.get('id') not in self.state['processed_posts']:
+                rid = int(r.get('id'))
+                if rid not in self.state['processed_posts']:
                     new_posts.append(r)
         return new_posts
 
@@ -243,6 +250,7 @@ class AutonomousBot:
                 self.state["processed_threads"].append(thread_id)
                 self._log_action("reply_to_thread", thread_id, content, True)
                 self._increment_daily_count("reply_to_thread")
+                self._save_state()  # 立即保存
             else:
                 self._log_action("reply_to_thread", thread_id, content, False)
             return success
@@ -258,6 +266,7 @@ class AutonomousBot:
                 self.state["processed_posts"].append(post_id)
                 self._log_action("reply_to_post", post_id, content, True)
                 self._increment_daily_count("reply_to_post")
+                self._save_state()
             else:
                 self._log_action("reply_to_post", post_id, content, False)
             return success
@@ -288,6 +297,7 @@ class AutonomousBot:
             if success:
                 self._log_action("create_thread", f"cat{category_id}", title, True)
                 self._increment_daily_count("create_thread")
+                self._save_state()
             else:
                 self._log_action("create_thread", f"cat{category_id}", title, False)
             return success
