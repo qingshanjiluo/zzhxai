@@ -22,7 +22,8 @@ class BBSTurkeyBotLogin:
             'Accept': 'application/json, text/plain, */*',
             'Origin': self.base_url,
             'Referer': f'{self.base_url}/login',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'mbbs-domain': 'mk48by049.mbbs.cc'   # 关键请求头
         })
 
     def _init_ddddocr(self):
@@ -66,7 +67,7 @@ class BBSTurkeyBotLogin:
                 if captcha_id and svg_data:
                     print(f"[OK] 验证码获取成功, ID: {captcha_id}")
                     return captcha_id, svg_data
-            print("[错误] 验证码获取失败")
+            print(f"[错误] 验证码获取失败，状态码: {response.status_code}, 内容: {response.text[:200]}")
             return None, None
         except Exception as e:
             print(f"[错误] 获取验证码错误: {e}")
