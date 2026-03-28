@@ -6,24 +6,26 @@ import re
 
 class BBSTurkeyBotLogin:
     def __init__(self, base_url, username, password, max_retries=50):
-        self.base_url = base_url
-        self.api_base = f"{base_url}/bbs"
+        # 规范化 base_url，去掉尾部斜杠，避免 // 导致 404
+        self.base_url = base_url.rstrip('/')
+        self.api_base = f"{self.base_url}/bbs"
         self.username = username
         self.password = password
-        self.max_login_attempts = max_retries
-        self.max_captcha_retries = 3
+        self.max_login_attempts = max_retries          # 最大重试次数，默认 50
+        self.max_captcha_retries = 3                    # 验证码识别重试次数
         self.session = requests.Session()
         self._setup_headers()
         self.ocr = self._init_ddddocr()
 
     def _setup_headers(self):
+        """设置请求头，包含必需的 mbbs-domain"""
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Linux; Android 10; Termux) AppleWebKit/537.36',
             'Accept': 'application/json, text/plain, */*',
             'Origin': self.base_url,
             'Referer': f'{self.base_url}/login',
             'Content-Type': 'application/json',
-            'mbbs-domain': 'mk48by049.mbbs.cc'   # 关键请求头
+            'mbbs-domain': 'mk48by049.mbbs.cc'   # 关键头
         })
 
     def _init_ddddocr(self):
