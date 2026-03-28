@@ -12,7 +12,7 @@ class BBSTurkeyBotLogin:
         self.username = username
         self.password = password
         self.max_login_attempts = max_retries
-        self.max_captcha_retries = 3
+        self.max_captcha_retries = 50
         self.session = requests.Session()
         self._setup_headers()
         self.ocr = self._init_ddddocr()
