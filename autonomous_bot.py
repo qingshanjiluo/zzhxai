@@ -24,9 +24,8 @@ class AutonomousBot:
             raise ValueError("请设置 BOT_USERNAME 和 BOT_PASSWORD 环境变量")
 
         # 监听板块
-        self.target_categories = [
-            int(x) for x in os.getenv("TARGET_CATEGORIES", "2,5").split(",") if x
-        ]
+        target_categories_str = os.getenv("TARGET_CATEGORIES", "2,5")
+        self.target_categories = [int(x) for x in target_categories_str.split(",") if x.strip()]
 
         # 管理员删帖 token（可选）
         self.admin_mk49_token = os.getenv("ADMIN_MK49_TOKEN")
@@ -39,10 +38,13 @@ class AutonomousBot:
         self.state_file = "state.json"
         self.state = self._load_state()
 
-        # 每次运行最多执行的操作数（控制频率）
-        self.max_actions_per_run = int(os.getenv("MAX_ACTIONS_PER_RUN", "5"))
-        # 每日发帖上限（全局限制）
-        self.daily_post_limit = int(os.getenv("DAILY_POST_LIMIT", "10"))
+        # 每次运行最多执行的操作数
+        max_actions_str = os.getenv("MAX_ACTIONS_PER_RUN", "5")
+        self.max_actions_per_run = int(max_actions_str) if max_actions_str else 5
+
+        # 每日发帖上限（仅针对新帖子）
+        daily_limit_str = os.getenv("DAILY_POST_LIMIT", "10")
+        self.daily_post_limit = int(daily_limit_str) if daily_limit_str else 10
 
         # 登录后的凭证
         self.token = None
@@ -50,7 +52,7 @@ class AutonomousBot:
         self.session = None
         self.poster = None
 
-        # 频率记录：当天已发帖数
+        # 频率记录：当天已发新帖数
         self.today_posts_count = 0
 
     def _load_file(self, filename, default):
@@ -60,10 +62,9 @@ class AutonomousBot:
         return default
 
     def _load_state(self):
-        """加载状态文件，自动补充缺失字段"""
         default = {
-            "processed_threads": [],
-            "processed_posts": [],
+            "processed_threads": [],      # 已回复的帖子 ID（作为一级评论）
+            "processed_posts": [],        # 保留，但不使用
             "action_logs": [],
             "daily_stats": {},
             "last_run": None
@@ -71,11 +72,9 @@ class AutonomousBot:
         if os.path.exists(self.state_file):
             with open(self.state_file, 'r', encoding='utf-8') as f:
                 state = json.load(f)
-            # 确保所有必需的键存在
             for key, value in default.items():
                 if key not in state:
                     state[key] = value
-            # 强制所有ID为整数
             if "processed_threads" in state:
                 state["processed_threads"] = [int(x) for x in state["processed_threads"]]
             if "processed_posts" in state:
@@ -85,7 +84,6 @@ class AutonomousBot:
             return default
 
     def _save_state(self):
-        """保存状态，强制更新 last_run 时间戳"""
         self.state["last_run"] = datetime.now().isoformat()
         with open(self.state_file, 'w', encoding='utf-8') as f:
             json.dump(self.state, f, indent=2, ensure_ascii=False)
@@ -106,23 +104,18 @@ class AutonomousBot:
     def _update_daily_stats(self):
         today = date.today().isoformat()
         if today not in self.state["daily_stats"]:
-            self.state["daily_stats"][today] = {"posts": 0, "replies": 0}
+            self.state["daily_stats"][today] = {"posts": 0}
         self.today_posts_count = self.state["daily_stats"][today]["posts"]
 
-    def _increment_daily_count(self, action_type):
+    def _increment_daily_count(self):
         today = date.today().isoformat()
         if today not in self.state["daily_stats"]:
-            self.state["daily_stats"][today] = {"posts": 0, "replies": 0}
-        if action_type in ("create_thread", "reply_to_thread", "reply_to_post"):
-            if action_type == "create_thread":
-                self.state["daily_stats"][today]["posts"] += 1
-                self.today_posts_count = self.state["daily_stats"][today]["posts"]
-            else:
-                self.state["daily_stats"][today]["replies"] += 1
+            self.state["daily_stats"][today] = {"posts": 0}
+        self.state["daily_stats"][today]["posts"] += 1
+        self.today_posts_count = self.state["daily_stats"][today]["posts"]
         self._save_state()
 
     def login(self):
-        """使用 BBSTurkeyBotLogin 登录"""
         print(f"🔐 登录账号: {self.username}")
         login_bot = BBSTurkeyBotLogin(
             base_url=self.base_url,
@@ -150,7 +143,7 @@ class AutonomousBot:
         return True
 
     def get_new_threads(self):
-        """获取未处理的新帖子"""
+        """获取未处理的新帖子（未被回复过的）"""
         new_threads = []
         for cat_id in self.target_categories:
             threads = self.poster.get_threads(self.token, category_id=cat_id, page_limit=20)
@@ -162,25 +155,8 @@ class AutonomousBot:
                     new_threads.append(t)
         return new_threads
 
-    def get_new_posts(self, thread_id):
-        """获取某个帖子下未处理的新评论（包括嵌套）"""
-        new_posts = []
-        posts = self.poster.get_post_comments(self.token, thread_id)
-        if not isinstance(posts, list):
-            return []
-        for p in posts:
-            pid = int(p.get('id'))
-            if pid not in self.state['processed_posts']:
-                new_posts.append(p)
-            replies = self.poster.get_comment_replies(self.token, pid)
-            for r in replies:
-                rid = int(r.get('id'))
-                if rid not in self.state['processed_posts']:
-                    new_posts.append(r)
-        return new_posts
-
     def decide_action(self, context):
-        """AI 决策下一步行动，包含频率约束提示"""
+        """AI 决策：只允许回复帖子、发新帖、点赞、加精、删帖（禁止回复评论）"""
         daily_limit_warning = ""
         if self.today_posts_count >= self.daily_post_limit:
             daily_limit_warning = "\n⚠️ 你今天已经达到每日发帖上限，请不要再创建新帖子（create_thread）。"
@@ -199,18 +175,18 @@ class AutonomousBot:
 
 【频率限制】
 - 每天最多发 {self.daily_post_limit} 个新帖子（create_thread）。
-- 其他回复操作（reply_to_thread, reply_to_post, like 等）无严格上限，但请避免刷屏。
+- 回复帖子（reply_to_thread）不设严格上限，但请避免刷屏。
 {daily_limit_warning}
 
 【你可以执行的操作】
 - reply_to_thread: 回复帖子（需要 thread_id 和回复内容）
-- reply_to_post: 回复评论（需要 post_id 和回复内容，可指定 reply_to_post_id 实现嵌套）
 - like_thread: 给帖子点赞（thread_id）
-- like_post: 给评论点赞（post_id）
 - create_thread: 发布新帖子（需要 title, content, category_id）
 - set_essence: 给帖子加精（thread_id，需管理员权限）
 - delete_thread: 删除帖子（thread_id，需管理员权限，仅在必要时使用）
 - ignore: 不采取任何行动
+
+【注意】你只能回复帖子本身，不能回复评论。
 
 【输出格式】
 请只输出一个 JSON 对象，不要有其他内容。
@@ -249,26 +225,9 @@ class AutonomousBot:
             if success:
                 self.state["processed_threads"].append(thread_id)
                 self._log_action("reply_to_thread", thread_id, content, True)
-                self._increment_daily_count("reply_to_thread")
                 self._save_state()  # 立即保存
             else:
                 self._log_action("reply_to_thread", thread_id, content, False)
-            return success
-
-        elif action == "reply_to_post":
-            post_id = decision.get("post_id")
-            content = decision.get("content")
-            reply_to = decision.get("reply_to_post_id")
-            if not post_id or not content:
-                return False
-            success = self.poster.reply_to_comment(self.token, post_id, content, reply_to)
-            if success:
-                self.state["processed_posts"].append(post_id)
-                self._log_action("reply_to_post", post_id, content, True)
-                self._increment_daily_count("reply_to_post")
-                self._save_state()
-            else:
-                self._log_action("reply_to_post", post_id, content, False)
             return success
 
         elif action == "like_thread":
@@ -277,14 +236,6 @@ class AutonomousBot:
                 return False
             success = self.poster.set_thread_like(self.token, thread_id, like=True)
             self._log_action("like_thread", thread_id, "", success)
-            return success
-
-        elif action == "like_post":
-            post_id = decision.get("post_id")
-            if not post_id:
-                return False
-            success = self.poster.set_post_like(self.token, post_id, like=True)
-            self._log_action("like_post", post_id, "", success)
             return success
 
         elif action == "create_thread":
@@ -296,7 +247,7 @@ class AutonomousBot:
             success, _ = self.poster.create_thread(self.token, category_id, title, content)
             if success:
                 self._log_action("create_thread", f"cat{category_id}", title, True)
-                self._increment_daily_count("create_thread")
+                self._increment_daily_count()
                 self._save_state()
             else:
                 self._log_action("create_thread", f"cat{category_id}", title, False)
@@ -326,16 +277,16 @@ class AutonomousBot:
             return False
 
     def run_once(self):
-        """单次运行：扫描新内容，AI 决策并执行"""
+        """单次运行：扫描新帖子，AI 决策并执行"""
         try:
             if not self.login():
                 return
 
-            self._update_daily_stats()  # 更新今日发帖计数
+            self._update_daily_stats()
 
             actions_done = 0
 
-            # 1. 扫描新帖子
+            # 扫描新帖子
             new_threads = self.get_new_threads()
             for thread in new_threads:
                 if actions_done >= self.max_actions_per_run:
@@ -352,31 +303,7 @@ class AutonomousBot:
                 if decision.get("action") != "ignore":
                     self.execute_action(decision)
                     actions_done += 1
-                time.sleep(2)  # 评论频率间隔
-
-            # 2. 扫描已处理帖子的新评论
-            recent_threads = self.state["processed_threads"][-20:]
-            for thread_id in recent_threads:
-                if actions_done >= self.max_actions_per_run:
-                    break
-                new_posts = self.get_new_posts(thread_id)
-                for post in new_posts:
-                    if actions_done >= self.max_actions_per_run:
-                        break
-                    print(f"💬 发现新评论: {post.get('content', '')[:50]}... (ID: {post['id']})")
-                    context = f"""
-这是一个评论：
-内容：{post['content']}
-发布者：{post.get('user', {}).get('nickname', '未知')}
-所属帖子ID：{post.get('thread_id')}
-评论ID：{post['id']}
-如果这是对其他评论的回复，原回复ID可能是：{post.get('reply_to_post_id', '无')}
-"""
-                    decision = self.decide_action(context)
-                    if decision.get("action") != "ignore":
-                        self.execute_action(decision)
-                        actions_done += 1
-                    time.sleep(2)
+                time.sleep(2)
 
             print(f"✅ 本轮执行了 {actions_done} 个操作")
         except Exception as e:
