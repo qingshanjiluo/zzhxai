@@ -5,28 +5,33 @@ import json
 class BBSPoster:
     def __init__(self, session, base_url):
         self.session = session
-        self.base_url = base_url
-        self.api_base = f"{base_url}/bbs"
-        
-        # API 端点（已根据接口文档修正）
-        self.create_thread_url = f"{self.api_base}/threads"
-        self.list_threads_url = f"{self.api_base}/threads/list"
-        self.list_posts_url = f"{self.api_base}/posts/list"
-        self.create_post_url = f"{self.api_base}/posts/create"
-        self.set_essence_url = f"{self.api_base}/threads/setEssence"
-        self.set_sticky_url = f"{self.api_base}/threads/setSticky"
-        self.set_approved_url = f"{self.api_base}/threads/setApproved"
-        self.set_thread_like_url = f"{self.api_base}/threads/setLike"
-        self.set_post_like_url = f"{self.api_base}/posts/setLike"
-        self.batch_delete_threads_url = f"{self.api_base}/threads/batchDelete"
-        self.batch_delete_posts_url = f"{self.api_base}/posts/batchDeletePosts"
-        self.create_comment_reply_url = f"{self.api_base}/posts/createComment"
-        self.list_comments_replies_url = f"{self.api_base}/posts/listComments"
-        self.user_list_url = f"{self.api_base}/users/list"
-        self.get_thread_url = f"{self.api_base}/threads"          # 获取单个帖子，需拼接ID
+        self.base_url = base_url.rstrip('/')
+        self.api_base = self.base_url  # API 根地址与 base_url 相同（例如 https://mbbs.zdjl.site/mk48by049.mbbs.cc）
+        # 添加必需的 mbbs-domain 头
+        self.session.headers.update({
+            'mbbs-domain': 'mk48by049.mbbs.cc'
+        })
 
+        # API 端点
+        self.create_thread_url = f"{self.api_base}/bbs/threads"
+        self.list_threads_url = f"{self.api_base}/bbs/threads/list"
+        self.list_posts_url = f"{self.api_base}/bbs/posts/list"
+        self.create_post_url = f"{self.api_base}/bbs/posts/create"
+        self.set_essence_url = f"{self.api_base}/bbs/threads/setEssence"
+        self.set_sticky_url = f"{self.api_base}/bbs/threads/setSticky"
+        self.set_approved_url = f"{self.api_base}/bbs/threads/setApproved"
+        self.set_thread_like_url = f"{self.api_base}/bbs/threads/setLike"
+        self.set_post_like_url = f"{self.api_base}/bbs/posts/setLike"
+        self.batch_delete_threads_url = f"{self.api_base}/bbs/threads/batchDelete"
+        self.batch_delete_posts_url = f"{self.api_base}/bbs/posts/batchDeletePosts"
+        self.create_comment_reply_url = f"{self.api_base}/bbs/posts/createComment"
+        self.list_comments_replies_url = f"{self.api_base}/bbs/posts/listComments"
+        self.user_list_url = f"{self.api_base}/bbs/users/list"
+        self.get_thread_url = f"{self.api_base}/bbs/threads"
+
+    # ---------- 核心方法 ----------
     def create_thread(self, token, category_id, title, content):
-        """创建新帖子，返回 (success, thread_data)"""
+        """创建新帖子"""
         try:
             headers = {'Authorization': token, 'Content-Type': 'application/json'}
             thread_data = {
@@ -192,11 +197,11 @@ class BBSPoster:
             print(f"[异常] 回复评论异常: {e}")
             return False
 
+    # ---------- 管理功能（可选）----------
     def delete_thread(self, token, thread_id):
-        """删除帖子"""
         try:
             headers = {'Authorization': token}
-            url = f"{self.api_base}/threads/{thread_id}"
+            url = f"{self.api_base}/bbs/threads/{thread_id}"
             response = self.session.delete(url, headers=headers, timeout=15)
             return response.status_code == 200
         except Exception as e:
@@ -204,7 +209,6 @@ class BBSPoster:
             return False
 
     def batch_delete_threads(self, token, thread_ids):
-        """批量删除帖子"""
         try:
             headers = {'Authorization': token, 'Content-Type': 'application/json'}
             data = {"thread_ids": thread_ids}
@@ -215,7 +219,6 @@ class BBSPoster:
             return False
 
     def set_essence(self, token, thread_id, is_essence=True):
-        """设置/取消精华"""
         try:
             headers = {'Authorization': token, 'Content-Type': 'application/json'}
             data = {"thread_id": thread_id, "is_essence": is_essence}
@@ -226,7 +229,6 @@ class BBSPoster:
             return False
 
     def set_sticky(self, token, thread_id, is_sticky=True):
-        """设置/取消置顶"""
         try:
             headers = {'Authorization': token, 'Content-Type': 'application/json'}
             data = {"thread_id": thread_id, "is_sticky": is_sticky}
@@ -237,7 +239,6 @@ class BBSPoster:
             return False
 
     def set_approved(self, token, thread_id, is_approved=True):
-        """审核帖子"""
         try:
             headers = {'Authorization': token, 'Content-Type': 'application/json'}
             data = {"thread_id": thread_id, "is_approved": is_approved}
@@ -248,7 +249,6 @@ class BBSPoster:
             return False
 
     def set_thread_like(self, token, thread_id, like=True):
-        """点赞/取消点赞帖子"""
         try:
             headers = {'Authorization': token, 'Content-Type': 'application/json'}
             data = {"thread_id": thread_id, "is_like": like}
@@ -259,7 +259,6 @@ class BBSPoster:
             return False
 
     def set_post_like(self, token, post_id, like=True):
-        """点赞/取消点赞评论"""
         try:
             headers = {'Authorization': token, 'Content-Type': 'application/json'}
             data = {"post_id": post_id, "is_like": like}
@@ -270,10 +269,9 @@ class BBSPoster:
             return False
 
     def delete_comment(self, token, comment_id):
-        """删除评论"""
         try:
             headers = {'Authorization': token}
-            url = f"{self.api_base}/posts/{comment_id}"
+            url = f"{self.api_base}/bbs/posts/{comment_id}"
             response = self.session.delete(url, headers=headers, timeout=15)
             return response.status_code == 200
         except Exception as e:
@@ -281,7 +279,6 @@ class BBSPoster:
             return False
 
     def batch_delete_comments(self, token, comment_ids):
-        """批量删除评论"""
         try:
             headers = {'Authorization': token, 'Content-Type': 'application/json'}
             data = {"post_ids": comment_ids}
@@ -292,7 +289,6 @@ class BBSPoster:
             return False
 
     def get_user_list(self, token, page=1, page_size=20, search=""):
-        """获取用户列表（管理员）"""
         try:
             headers = {'Authorization': token}
             params = {"page": page, "page_size": page_size}
@@ -314,6 +310,5 @@ class BBSPoster:
             return []
 
     def get_notifications(self, token):
-        """获取通知（预留，暂未实现）"""
         print("[消息] get_notifications 功能暂未实现，返回空列表")
         return []
