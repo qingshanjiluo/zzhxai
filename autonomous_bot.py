@@ -1,3 +1,4 @@
+# autonomous_bot.py
 import os
 import json
 import time
@@ -16,7 +17,7 @@ class AutonomousBot:
             raise ValueError("请设置 DEEPSEEK_API_KEY 环境变量")
         self.client = DeepSeekClient(api_key=self.api_key)
 
-        # 论坛配置
+        # 论坛配置 - 必须使用 API 根地址
         self.base_url = os.getenv("BASE_URL", "https://mbbs.zdjl.site/mk48by049.mbbs.cc")
         self.username = os.getenv("BOT_USERNAME")
         self.password = os.getenv("BOT_PASSWORD")
@@ -56,9 +57,9 @@ class AutonomousBot:
             with open(self.state_file, 'r', encoding='utf-8') as f:
                 return json.load(f)
         return {
-            "processed_threads": [],   # 已处理的帖子 ID
-            "processed_posts": [],     # 已处理的评论 ID（含嵌套）
-            "action_logs": []          # 历史操作记录
+            "processed_threads": [],
+            "processed_posts": [],
+            "action_logs": []
         }
 
     def _save_state(self):
@@ -104,7 +105,6 @@ class AutonomousBot:
         print(f"✅ 登录成功，用户ID: {self.user_id}")
         return True
 
-    # ---------- 获取帖子与评论 ----------
     def get_new_threads(self):
         """获取未处理的新帖子"""
         new_threads = []
@@ -118,42 +118,25 @@ class AutonomousBot:
                     new_threads.append(t)
         return new_threads
 
-    def get_post_replies(self, post_id):
-        """获取某条评论的回复（嵌套）"""
-        try:
-            url = f"{self.poster.api_base}/posts/listComments"
-            headers = {'Authorization': self.token}
-            params = {'post_id': post_id, 'page_limit': 100, 'page_offset': 0}
-            resp = self.session.get(url, headers=headers, params=params, timeout=10)
-            if resp.status_code == 200:
-                data = resp.json()
-                if data.get('success'):
-                    return data.get('data', {}).get('list', [])
-            return []
-        except Exception as e:
-            print(f"获取评论回复失败: {e}")
-            return []
-
     def get_new_posts(self, thread_id):
         """获取某个帖子下未处理的新评论（包括嵌套）"""
         new_posts = []
-        # 获取一级评论
+        # 一级评论
         posts = self.poster.get_post_comments(self.token, thread_id)
         if not isinstance(posts, list):
             return []
         for p in posts:
             if p.get('id') not in self.state['processed_posts']:
                 new_posts.append(p)
-            # 获取该评论的回复
-            replies = self.get_post_replies(p['id'])
+            # 评论的回复
+            replies = self.poster.get_comment_replies(self.token, p['id'])
             for r in replies:
                 if r.get('id') not in self.state['processed_posts']:
                     new_posts.append(r)
         return new_posts
 
-    # ---------- AI 决策 ----------
     def decide_action(self, context):
-        """使用 AI 决策下一步行动"""
+        """AI 决策下一步行动"""
         prompt = f"""
 你是一个论坛用户，你需要根据当前的情况决定做什么。
 
@@ -192,7 +175,6 @@ class AutonomousBot:
             print(f"解析 AI 决策失败: {e}")
             return {"action": "ignore", "reason": "解析异常"}
 
-    # ---------- 执行操作 ----------
     def execute_action(self, decision):
         action = decision.get("action")
         if action == "ignore":
@@ -215,11 +197,10 @@ class AutonomousBot:
         elif action == "reply_to_post":
             post_id = decision.get("post_id")
             content = decision.get("content")
-            reply_to = decision.get("reply_to_post_id")  # 可选，嵌套回复
+            reply_to = decision.get("reply_to_post_id")
             if not post_id or not content:
                 return False
-            # 使用 BBSPoster 的 reply_to_comment 方法
-            success = self.poster.reply_to_comment(self.token, post_id, content, comment_post_id=reply_to)
+            success = self.poster.reply_to_comment(self.token, post_id, content, reply_to)
             if success:
                 self.state["processed_posts"].append(post_id)
                 self._log_action("reply_to_post", post_id, content, True)
@@ -265,7 +246,6 @@ class AutonomousBot:
             print(f"未知操作: {action}")
             return False
 
-    # ---------- 主循环 ----------
     def run_once(self):
         """单次运行：扫描新内容，AI 决策并执行"""
         try:
