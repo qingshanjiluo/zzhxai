@@ -1,9 +1,11 @@
+# autonomous_bot.py
 import os
 import json
 import time
 import re
+import traceback
 from datetime import datetime
-from login import BBSTurkeyBotLogin      # 复用原有的登录类
+from login import BBSTurkeyBotLogin
 from forum_api import ForumAPI
 from deepseek_client import DeepSeekClient
 
@@ -250,47 +252,24 @@ class AutonomousBot:
 
     def run_once(self):
         """单次运行：扫描新内容，AI 决策并执行"""
-        if not self.login():
-            return
+        try:
+            if not self.login():
+                return
 
-        actions_done = 0
+            actions_done = 0
 
-        # 1. 扫描新帖子
-        new_threads = self.get_new_threads()
-        for thread in new_threads:
-            if actions_done >= self.max_actions_per_run:
-                break
-            print(f"📄 发现新帖子: {thread['title']} (ID: {thread['id']})")
-            context = f"""
+            # 1. 扫描新帖子
+            new_threads = self.get_new_threads()
+            for thread in new_threads:
+                if actions_done >= self.max_actions_per_run:
+                    break
+                print(f"📄 发现新帖子: {thread['title']} (ID: {thread['id']})")
+                context = f"""
 这是一个新帖子：
 标题：{thread['title']}
 内容：{thread.get('content', '')}
 发布者：{thread.get('user', {}).get('nickname', '未知')}
 帖子ID：{thread['id']}
-"""
-            decision = self.decide_action(context)
-            if decision.get("action") != "ignore":
-                self.execute_action(decision)
-                actions_done += 1
-            time.sleep(2)
-
-        # 2. 扫描已处理帖子的新评论
-        recent_threads = self.state["processed_threads"][-20:]  # 只扫描最近20个帖子
-        for thread_id in recent_threads:
-            if actions_done >= self.max_actions_per_run:
-                break
-            new_posts = self.get_new_posts(thread_id)
-            for post in new_posts:
-                if actions_done >= self.max_actions_per_run:
-                    break
-                print(f"💬 发现新评论: {post['content'][:50]}... (ID: {post['id']})")
-                context = f"""
-这是一个评论：
-内容：{post['content']}
-发布者：{post.get('user', {}).get('nickname', '未知')}
-所属帖子ID：{post['thread_id']}
-评论ID：{post['id']}
-如果这是对其他评论的回复，原回复ID可能是：{post.get('reply_to_post_id', '无')}
 """
                 decision = self.decide_action(context)
                 if decision.get("action") != "ignore":
@@ -298,8 +277,36 @@ class AutonomousBot:
                     actions_done += 1
                 time.sleep(2)
 
-        print(f"✅ 本轮执行了 {actions_done} 个操作")
-        self._save_state()
+            # 2. 扫描已处理帖子的新评论
+            recent_threads = self.state["processed_threads"][-20:]  # 只扫描最近20个帖子
+            for thread_id in recent_threads:
+                if actions_done >= self.max_actions_per_run:
+                    break
+                new_posts = self.get_new_posts(thread_id)
+                for post in new_posts:
+                    if actions_done >= self.max_actions_per_run:
+                        break
+                    print(f"💬 发现新评论: {post['content'][:50]}... (ID: {post['id']})")
+                    context = f"""
+这是一个评论：
+内容：{post['content']}
+发布者：{post.get('user', {}).get('nickname', '未知')}
+所属帖子ID：{post['thread_id']}
+评论ID：{post['id']}
+如果这是对其他评论的回复，原回复ID可能是：{post.get('reply_to_post_id', '无')}
+"""
+                    decision = self.decide_action(context)
+                    if decision.get("action") != "ignore":
+                        self.execute_action(decision)
+                        actions_done += 1
+                    time.sleep(2)
+
+            print(f"✅ 本轮执行了 {actions_done} 个操作")
+        except Exception as e:
+            print(f"❌ 运行过程中发生错误: {e}")
+            traceback.print_exc()
+        finally:
+            self._save_state()  # 确保状态保存
 
 if __name__ == "__main__":
     bot = AutonomousBot()
