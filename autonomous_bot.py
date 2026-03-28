@@ -1,3 +1,4 @@
+# autonomous_bot.py
 import os
 import json
 import time
@@ -29,7 +30,7 @@ class AutonomousBot:
         ]
 
         # 管理员删帖 token（可选）
-        self.admin_mk49_token = os.getenv("ADMIN_MK49_TOKEN")  # 不设置则不能删帖
+        self.admin_mk49_token = os.getenv("ADMIN_MK49_TOKEN")
 
         # 加载风格文档和背景知识
         self.style = self._load_file("style.txt", "你是一个论坛用户，回复风格幽默风趣。")
@@ -62,13 +63,24 @@ class AutonomousBot:
     def _load_state(self):
         if os.path.exists(self.state_file):
             with open(self.state_file, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        return {
-            "processed_threads": [],
-            "processed_posts": [],
-            "action_logs": [],
-            "daily_stats": {}      # 按日期记录发帖数
-        }
+                state = json.load(f)
+            # 确保所有必需的键存在
+            if "daily_stats" not in state:
+                state["daily_stats"] = {}
+            if "processed_threads" not in state:
+                state["processed_threads"] = []
+            if "processed_posts" not in state:
+                state["processed_posts"] = []
+            if "action_logs" not in state:
+                state["action_logs"] = []
+            return state
+        else:
+            return {
+                "processed_threads": [],
+                "processed_posts": [],
+                "action_logs": [],
+                "daily_stats": {}
+            }
 
     def _save_state(self):
         with open(self.state_file, 'w', encoding='utf-8') as f:
@@ -162,7 +174,6 @@ class AutonomousBot:
 
     def decide_action(self, context):
         """AI 决策下一步行动，包含频率约束提示"""
-        # 动态提示词，加入当前频率限制
         daily_limit_warning = ""
         if self.today_posts_count >= self.daily_post_limit:
             daily_limit_warning = "\n⚠️ 你今天已经达到每日发帖上限，请不要再创建新帖子（create_thread）。"
