@@ -6,19 +6,18 @@ import re
 
 class BBSTurkeyBotLogin:
     def __init__(self, base_url, username, password, max_retries=50):
-        # 规范化 base_url，去掉尾部斜杠，避免 // 导致 404
+        # 规范化 base_url，去掉尾部斜杠
         self.base_url = base_url.rstrip('/')
-        self.api_base = f"{self.base_url}/bbs"
+        self.api_base = self.base_url                      # 直接使用 base_url 作为 API 根
         self.username = username
         self.password = password
-        self.max_login_attempts = max_retries          # 最大重试次数，默认 50
-        self.max_captcha_retries = 3                    # 验证码识别重试次数
+        self.max_login_attempts = max_retries
+        self.max_captcha_retries = 3
         self.session = requests.Session()
         self._setup_headers()
         self.ocr = self._init_ddddocr()
 
     def _setup_headers(self):
-        """设置请求头，包含必需的 mbbs-domain"""
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Linux; Android 10; Termux) AppleWebKit/537.36',
             'Accept': 'application/json, text/plain, */*',
@@ -60,7 +59,7 @@ class BBSTurkeyBotLogin:
     def get_login_captcha(self):
         try:
             print("[相机] 获取登录验证码...")
-            response = self.session.get(f"{self.api_base}/login/captcha", timeout=10)
+            response = self.session.get(f"{self.api_base}/bbs/login/captcha", timeout=10)
             if response.status_code == 200:
                 data = response.json()
                 captcha_data = data.get('data', {})
@@ -108,7 +107,7 @@ class BBSTurkeyBotLogin:
                 "captcha_text": captcha_text
             }
             print("[登录] 提交登录请求...")
-            response = self.session.post(f"{self.api_base}/login", json=login_data, timeout=15)
+            response = self.session.post(f"{self.api_base}/bbs/login", json=login_data, timeout=15)
             print(f"[响应] 状态码: {response.status_code}")
             if response.status_code == 200:
                 result = response.json()
