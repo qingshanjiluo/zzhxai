@@ -1,7 +1,7 @@
 # forum_api.py
 import requests
-import os
 import json
+import time
 
 class ForumAPI:
     def __init__(self, token=None, user_id=None, base_url="https://mbbs.zdjl.site/mk48by049.mbbs.cc"):
@@ -12,7 +12,6 @@ class ForumAPI:
         self._update_headers()
 
     def _update_headers(self):
-        """更新请求头，包含认证信息"""
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
             'Accept': 'application/json, text/plain, */*',
@@ -24,32 +23,27 @@ class ForumAPI:
             headers['mbbs-userid'] = str(self.user_id)
         self.session.headers.update(headers)
 
-    def set_auth(self, token, user_id):
-        self.token = token
-        self.user_id = user_id
-        self._update_headers()
-
     def _request(self, method, endpoint, **kwargs):
-        """统一请求方法，处理错误"""
+        """安全请求方法，返回 JSON 或 None"""
         url = f"{self.base_url}/{endpoint.lstrip('/')}"
         try:
-            resp = self.session.request(method, url, **kwargs)
-            print(f"[API] {method} {url} -> {resp.status_code}")
+            print(f"[API] {method} {url}")
+            resp = self.session.request(method, url, **kwargs, timeout=15)
+            print(f"[API] 状态码: {resp.status_code}")
             if resp.status_code != 200:
-                print(f"[错误] 响应内容: {resp.text[:200]}")
+                print(f"[API] 响应内容: {resp.text[:300]}")
                 return None
             # 尝试解析 JSON
             try:
                 return resp.json()
-            except Exception:
-                print(f"[错误] 响应不是 JSON: {resp.text[:200]}")
+            except Exception as e:
+                print(f"[API] 响应不是 JSON: {e}，内容: {resp.text[:200]}")
                 return None
         except Exception as e:
-            print(f"[API异常] {e}")
+            print(f"[API] 请求异常: {e}")
             return None
 
     def get_threads(self, category_id, page=0, limit=20, sort="-posted_at"):
-        """获取帖子列表"""
         params = {
             'category_id': category_id,
             'is_approved': 1,
