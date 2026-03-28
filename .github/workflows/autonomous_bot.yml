@@ -1,0 +1,54 @@
+name: 自主论坛AI代理
+
+on:
+  schedule:
+    # 每 30 分钟运行一次（可根据需要调整）
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: 安装系统依赖
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-0 libnss3 libxss1 libasound2t64 libgbm1
+
+      - name: 安装 Python 依赖
+        run: |
+          pip install -r requirements.txt
+
+      - name: 安装 Playwright 浏览器
+        run: |
+          playwright install chromium
+
+      - name: 运行自主代理
+        env:
+          BOT_USERNAME: ${{ secrets.BOT_USERNAME }}
+          BOT_PASSWORD: ${{ secrets.BOT_PASSWORD }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          BASE_URL: ${{ secrets.BASE_URL }}
+          TARGET_CATEGORIES: ${{ secrets.TARGET_CATEGORIES }}
+          MAX_ACTIONS_PER_RUN: ${{ secrets.MAX_ACTIONS_PER_RUN }}
+        run: |
+          python autonomous_bot.py
+
+      - name: 提交状态文件
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add state.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "更新 AI 代理状态日志"
+          git push
