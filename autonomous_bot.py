@@ -121,7 +121,7 @@ class AutonomousBot:
             base_url=self.base_url,
             username=self.username,
             password=self.password,
-            max_retries=3
+            max_retries=50
         )
         success, result, session = login_bot.login_with_retry()
         if not success:
