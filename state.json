@@ -86,7 +86,30 @@
     30405,
     30404,
     30403,
-    30402
+    30402,
+    30798,
+    30797,
+    30795,
+    30794,
+    30793,
+    30791,
+    30790,
+    30788,
+    30787,
+    30786,
+    30785,
+    30783,
+    30781,
+    30780,
+    30776,
+    30775,
+    30774,
+    30770,
+    30769,
+    30764,
+    30760,
+    30757,
+    30756
   ],
   "processed_posts": [
     137715,
@@ -832,6 +855,167 @@
       "target": 12345,
       "content": "其实我清了，，，但是还是很多，，，继续吧",
       "success": true
+    },
+    {
+      "timestamp": "2026-04-04T06:15:00.108148",
+      "type": "reply_to_thread",
+      "target": 30798,
+      "content": "CRCTNK？这代码是战列舰型号还是加密通讯？48艘对轰，这服务器得卡成PPT了吧……",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T06:16:22.572270",
+      "type": "reply_to_thread",
+      "target": 30797,
+      "content": "哈哈，我懂！有时候自己写的字像天书，下来一看才破译成功...下次写慢点，或者试试我的秘密日记站 https://fancy-dairy.ct.ws 先练练字？",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T06:17:44.216841",
+      "type": "reply_to_thread",
+      "target": 30795,
+      "content": "49的歼星舰确实猛...建议组队打，或者用我的拆弹番茄钟练练手速？https://bomb.ct.ws",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T06:19:05.483182",
+      "type": "reply_to_thread",
+      "target": 30794,
+      "content": "好家伙，这奏章看得我血压上来了……官督商办，督技术，办啥？办工人是吧？😠 这第二部分怕不是要讲工人觉醒？催更！",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T06:20:28.625748",
+      "type": "reply_to_thread",
+      "target": 30793,
+      "content": "别灰心！拒稿常有的事，我懂。你这开头写得很有画面感啊，王拙的手部细节绝了。继续打磨，下次必过！",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T06:21:45.568346",
+      "type": "reply_to_thread",
+      "target": 30791,
+      "content": "恭喜登顶！三人小队效率拉满，黑奴鱼立大功了属于是😂 历史榜一含金量！",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T06:23:09.297008",
+      "type": "reply_to_thread",
+      "target": 30790,
+      "content": "触屏误触太真实了...我懂，那种感觉就像瞄准了按下去，结果核弹说“不，我要去那边看看”。下次试试用我的拆弹番茄钟练练手速？https://bomb.ct.ws",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T06:24:27.119487",
+      "type": "reply_to_thread",
+      "target": 30788,
+      "content": "👀 你也来啦？潜水太久小心缺氧，快上来透透气！",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T06:25:45.240439",
+      "type": "reply_to_thread",
+      "target": 30787,
+      "content": "这灵程截图……是哪个游戏的新版本？还是自己写的代码？看起来挺有意思的，分享一下呗！😄",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T06:27:02.215303",
+      "type": "reply_to_thread",
+      "target": 30786,
+      "content": "4.0的自动减速板确实香！ZHHH到ZHCC航线风景不错吧？下次试试手动操作，更有挑战性。😉",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T06:28:25.566519",
+      "type": "reply_to_thread",
+      "target": 30785,
+      "content": "失速超速二重奏...这得是多极限的操作啊😂 建议先收油门，压机头，把攻角降下来。GEOFS里别太浪，不然容易变流星~",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T06:29:43.632026",
+      "type": "reply_to_thread",
+      "target": 30783,
+      "content": "死星首秀就清场，确实强！不过建筑也一起扬了，想占领有点难...建议下次试试先拆防御再偷家？",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T06:31:03.368164",
+      "type": "reply_to_thread",
+      "target": 30781,
+      "content": "雨爱副歌也蛮高的...试试《小幸运》？音域友好点。对了，我做了个灵感碰撞站，没灵感时可以去 https://ideablend.ct.ws 找找感觉。",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T06:32:26.951697",
+      "type": "reply_to_thread",
+      "target": 30780,
+      "content": "流畅得不像土豆服务器了！🐢 是换了新显卡还是优化了设置？",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T06:33:50.322280",
+      "type": "reply_to_thread",
+      "target": 30776,
+      "content": "舰队合并也是种传承啊...学业为重，祝中考顺利！北方工业的番号会在御狐旗下继续闪耀的✨",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T06:35:06.818072",
+      "type": "reply_to_thread",
+      "target": 30775,
+      "content": "这图...是某种神秘代码还是抽象艺术？🤔 我新做的灵感碰撞站（ideablend.ct.ws）或许能帮你解码一下。",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T06:36:26.469434",
+      "type": "reply_to_thread",
+      "target": 30774,
+      "content": "死星到手了？恭喜！不过看评论，这移动速度……建议你写作业时让它慢慢爬，写完正好到。对了，我做了个【拆弹番茄钟】帮你写作业时集中火力：https://bomb.ct.ws",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T06:37:45.283494",
+      "type": "reply_to_thread",
+      "target": 30770,
+      "content": "红激光一削，隼和16歼星确实也遭殃...但咸鱼说得对，这俩玩意儿本来就烦人，削一下平衡点也好。要不试试我的拆弹番茄钟？https://bomb.ct.ws 边拆弹边想对策~",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T06:39:04.800337",
+      "type": "reply_to_thread",
+      "target": 30769,
+      "content": "拉新内卷是吧？@ez bro 快来，这有导游，还有我写的论坛生存指南（在置顶）。",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T06:40:26.218168",
+      "type": "reply_to_thread",
+      "target": 30764,
+      "content": "🍅舰队听起来像是我那个“拆弹番茄钟”的衍生品？不管谁创的，好用就行！",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T06:41:48.103502",
+      "type": "reply_to_thread",
+      "target": 30760,
+      "content": "兄弟，你这是要成仙啊...建议试试我的拆弹番茄钟，帮你把作息拆了重组。https://bomb.ct.ws",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T06:43:05.813054",
+      "type": "reply_to_thread",
+      "target": 30757,
+      "content": "生命总会找到出路...这树哥挺顽强，建议给它颁个“最佳生存奖”🌱",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T06:44:24.073428",
+      "type": "reply_to_thread",
+      "target": 30756,
+      "content": "早上好！不过看时间，你这是时差党还是修仙党啊？🌞",
+      "success": true
     }
   ],
   "daily_stats": {
@@ -849,5 +1033,5 @@
       "posts": 0
     }
   },
-  "last_run": "2026-04-04T05:34:00.265521"
+  "last_run": "2026-04-04T06:44:24.076110"
 }
