@@ -178,6 +178,7 @@ class AutonomousBot:
         return result
 
     def _get_all_comments(self, thread_id):
+        """递归获取帖子下所有评论（扁平列表），包含作者、时间等信息"""
         comments = []
         first_level = self.poster.get_post_comments(self.token, thread_id)
         for c in first_level:
@@ -185,13 +186,15 @@ class AutonomousBot:
                 "id": c['id'],
                 "content": c.get('content', ''),
                 "user_nickname": c.get('user', {}).get('nickname', '未知'),
-                "reply_to_post_id": None
+                "reply_to_post_id": None,
+                "created_at": c.get('created_at', '')
             })
             replies = self._get_replies(c['id'])
             comments.extend(replies)
         return comments
 
     def _get_replies(self, post_id):
+        """获取某条评论的所有回复，包含作者、时间"""
         replies = []
         resp = self.poster.get_comment_replies(self.token, post_id)
         for r in resp:
@@ -199,20 +202,32 @@ class AutonomousBot:
                 "id": r['id'],
                 "content": r.get('content', ''),
                 "user_nickname": r.get('user', {}).get('nickname', '未知'),
-                "reply_to_post_id": r.get('reply_to_post_id')
+                "reply_to_post_id": r.get('reply_to_post_id'),
+                "created_at": r.get('created_at', '')
             })
             deeper = self._get_replies(r['id'])
             replies.extend(deeper)
         return replies
 
     def decide_action(self, thread, comments):
-        """AI 决策，强制要求尽量不忽略"""
-        context = f"帖子标题：{thread['title']}\n帖子内容：{thread.get('content', '')}\n"
+        """AI 决策，包含帖子完整信息和评论元数据"""
+        # 提取帖子元数据
+        thread_title = thread.get('title', '无标题')
+        thread_content = thread.get('content', '')[:300]  # 限制长度
+        thread_author = thread.get('user', {}).get('nickname', '未知用户')
+        thread_time = thread.get('created_at', '未知时间')
+
+        context = f"帖子标题：{thread_title}\n"
+        context += f"发帖人：{thread_author}\n"
+        context += f"发帖时间：{thread_time}\n"
+        context += f"帖子内容：{thread_content}\n"
+
         if comments:
             context += "\n现有评论（按时间顺序）：\n"
-            for idx, c in enumerate(comments[:15]):
-                context += f"评论{idx+1} (ID:{c['id']}, 作者:{c['user_nickname']}): {c['content'][:100]}\n"
-                if c['reply_to_post_id']:
+            for idx, c in enumerate(comments[:15]):  # 最多展示15条评论
+                comment_time = c.get('created_at', '未知时间')[:19] if c.get('created_at') else '未知时间'
+                context += f"评论{idx+1} (ID:{c['id']}, 作者:{c['user_nickname']}, 时间:{comment_time}): {c['content'][:100]}\n"
+                if c.get('reply_to_post_id'):
                     context += f"  ↳ 回复评论ID: {c['reply_to_post_id']}\n"
         else:
             context += "暂无评论。\n"
@@ -228,7 +243,7 @@ class AutonomousBot:
 - 给帖子点赞
 - 发布一个新帖子（标题和内容）
 
-你的回复应简短幽默（不超过60字）。**强烈建议回复帖子或评论**。
+你的回复应简短幽默（不超过60字）。**强烈建议回复帖子或评论**。如果可以，请自然地提及发帖人、评论者或帖子内容，使回复更贴切。
 
 输出格式（只输出JSON）：
 {{"action": "reply_to_thread", "content": "回复内容"}}
@@ -336,7 +351,7 @@ class AutonomousBot:
                 all_items.extend(items)
                 # 如果已经达到配额上限，停止扫描
                 if (self.reply_threads_count >= self.max_reply_threads and
-                    self.reply_comments_count >= self.reply_comments_count and
+                    self.reply_comments_count >= self.max_reply_comments and
                     self.create_threads_count >= self.max_create_threads):
                     break
 
@@ -346,16 +361,14 @@ class AutonomousBot:
                 return
 
             # 动态计算每个帖子之间的间隔，使总运行时间接近 target_duration
-            # 减去已消耗的时间（登录等），剩余时间分配给所有帖子
             elapsed_before = time.time() - start_time
             remaining_seconds = max(10, self.target_duration - elapsed_before)
             interval_per_item = remaining_seconds / total_items
-            # 限制最大间隔为 180 秒，最小为 10 秒
             interval_per_item = min(180, max(10, interval_per_item))
             print(f"📊 共 {total_items} 个待处理帖子，计划每个间隔约 {interval_per_item:.1f} 秒")
 
             for idx, item in enumerate(all_items):
-                # 检查是否已超过配额（回复帖子、评论、发帖）
+                # 检查是否已超过配额
                 if (self.reply_threads_count >= self.max_reply_threads and
                     self.reply_comments_count >= self.max_reply_comments and
                     self.create_threads_count >= self.max_create_threads):
@@ -369,7 +382,6 @@ class AutonomousBot:
                 decision = self.decide_action(thread, comments)
                 self.execute_action(tid, decision, comments)
 
-                # 如果不是最后一个帖子，则等待动态计算的时间
                 if idx < total_items - 1:
                     wait_time = interval_per_item + random.uniform(-5, 5)
                     wait_time = max(5, wait_time)
