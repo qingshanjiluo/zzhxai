@@ -72,8 +72,8 @@ class AutonomousBot:
 
     def _load_state(self):
         default = {
-            "processed_threads": [],
-            "processed_posts": [],
+            "processed_threads": [],   # 已回复过的帖子ID
+            "processed_posts": [],     # 已回复过的评论ID
             "action_logs": [],
             "daily_stats": {},
             "last_run": None
@@ -154,7 +154,7 @@ class AutonomousBot:
         return True
 
     def get_threads_with_comments(self, category_id, limit=30):
-        """获取板块内的帖子，仅保留评论数 ≤ max_comments_to_skip 的帖子"""
+        """获取板块内的帖子，仅保留评论数 ≤ max_comments_to_skip 且未处理过的帖子"""
         threads = self.poster.get_threads(self.token, category_id=category_id, page_limit=limit)
         if not isinstance(threads, list):
             return []
@@ -162,6 +162,7 @@ class AutonomousBot:
         result = []
         for t in threads:
             tid = int(t.get('id'))
+            # 跳过已处理的帖子
             if tid in self.state['processed_threads']:
                 continue
             if tid in self.blacklist_threads:
@@ -182,9 +183,12 @@ class AutonomousBot:
         comments = []
         first_level = self.poster.get_post_comments(self.token, thread_id)
         for c in first_level:
+            # 跳过已经回复过的评论
+            if c.get('id') in self.state['processed_posts']:
+                continue
             comments.append({
                 "id": c['id'],
-                "content": c.get('content', ''),
+                "content": c.get('content', '')[:100],  # 限制长度
                 "user_nickname": c.get('user', {}).get('nickname', '未知'),
                 "reply_to_post_id": None,
                 "created_at": c.get('created_at', '')
@@ -194,13 +198,15 @@ class AutonomousBot:
         return comments
 
     def _get_replies(self, post_id):
-        """获取某条评论的所有回复，包含作者、时间"""
+        """获取某条评论的所有回复，包含作者、时间，并过滤已处理的"""
         replies = []
         resp = self.poster.get_comment_replies(self.token, post_id)
         for r in resp:
+            if r.get('id') in self.state['processed_posts']:
+                continue
             replies.append({
                 "id": r['id'],
-                "content": r.get('content', ''),
+                "content": r.get('content', '')[:100],
                 "user_nickname": r.get('user', {}).get('nickname', '未知'),
                 "reply_to_post_id": r.get('reply_to_post_id'),
                 "created_at": r.get('created_at', '')
@@ -211,9 +217,9 @@ class AutonomousBot:
 
     def decide_action(self, thread, comments):
         """AI 决策，包含帖子完整信息和评论元数据"""
-        # 提取帖子元数据
+        # 截取帖子内容前200字
         thread_title = thread.get('title', '无标题')
-        thread_content = thread.get('content', '')[:300]  # 限制长度
+        thread_content = (thread.get('content', '') or '')[:200]
         thread_author = thread.get('user', {}).get('nickname', '未知用户')
         thread_time = thread.get('created_at', '未知时间')
 
@@ -285,8 +291,8 @@ class AutonomousBot:
             content = decision.get("content", "")
             if not content:
                 content = "支持一下！"
-            success = self.poster.create_comment(self.token, thread_id, content)
-            if success:
+            success, comment_id = self.poster.create_comment(self.token, thread_id, content)
+            if success and comment_id:
                 self.reply_threads_count += 1
                 self._log_action("reply_to_thread", thread_id, content, True)
                 self.state["processed_threads"].append(thread_id)
@@ -304,8 +310,8 @@ class AutonomousBot:
             for c in comments:
                 if c['id'] == post_id and c['reply_to_post_id']:
                     reply_to = c['reply_to_post_id']
-            success = self.poster.reply_to_comment(self.token, post_id, content, reply_to)
-            if success:
+            success, comment_id = self.poster.reply_to_comment(self.token, post_id, content, reply_to)
+            if success and comment_id:
                 self.reply_comments_count += 1
                 self._log_action("reply_to_comment", post_id, content, True)
                 self.state["processed_posts"].append(post_id)
