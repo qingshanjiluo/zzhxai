@@ -19,52 +19,29 @@ class AutonomousBot:
         if not self.username or not self.password:
             raise ValueError("请设置 BOT_USERNAME 和 BOT_PASSWORD 环境变量")
 
-        # 监听板块
         target_categories_str = os.getenv("TARGET_CATEGORIES", "2,5")
         self.target_categories = [int(x) for x in target_categories_str.split(",") if x.strip()]
-
-        # 跳过每个板块最新 N 个帖子
         skip_latest_str = os.getenv("SKIP_LATEST", "5")
         self.skip_latest = int(skip_latest_str) if skip_latest_str else 5
-
-        # 登录重试次数
         login_retries_str = os.getenv("LOGIN_RETRIES", "50")
         self.login_retries = int(login_retries_str) if login_retries_str else 50
-
-        # 管理员删帖 token（可选）
         self.admin_mk49_token = os.getenv("ADMIN_MK49_TOKEN")
-
-        # 黑名单用户ID
         blacklist_str = os.getenv("BLACKLIST_USER_IDS", "")
         self.blacklist = [int(x) for x in blacklist_str.split(",") if x.strip()]
-
-        # 加载风格文档和背景知识
         self.style = self._load_file("style.txt", "你是一个论坛用户，回复风格幽默风趣。")
         self.background = self._load_file("mk48.txt", "")
-
-        # 状态持久化
         self.state_file = "state.json"
         self.state = self._load_state()
-
-        # 操作配额（可由环境变量配置）
         max_reply_threads_str = os.getenv("MAX_REPLY_THREADS", "15")
         self.max_reply_threads = int(max_reply_threads_str) if max_reply_threads_str else 15
         max_create_threads_str = os.getenv("MAX_CREATE_THREADS", "1")
         self.max_create_threads = int(max_create_threads_str) if max_create_threads_str else 1
-
-        # 每日发帖上限（仅针对新帖子）
         daily_limit_str = os.getenv("DAILY_POST_LIMIT", "10")
         self.daily_post_limit = int(daily_limit_str) if daily_limit_str else 10
-
-        # 操作计数
         self.reply_threads_count = 0
         self.create_threads_count = 0
         self.today_posts_count = 0
-
-        # DeepSeek 网页版连接器
         self.ds = None
-
-        # 登录后的凭证
         self.token = None
         self.user_id = None
         self.session = None
@@ -127,7 +104,6 @@ class AutonomousBot:
         self._save_state()
 
     def login(self):
-        """登录论坛并刷新权限"""
         print(f"🔐 登录账号: {self.username}")
         login_bot = BBSTurkeyBotLogin(
             base_url=self.base_url,
@@ -139,18 +115,14 @@ class AutonomousBot:
         if not success:
             print("❌ 登录失败")
             return False
-
         user_data = result.get('data', {})
         self.token = user_data.get('token')
         self.user_id = user_data.get('id')
         if not self.token or not self.user_id:
             print("❌ 登录响应缺少 token 或 user_id")
             return False
-
         self.session = session
         self.poster = BBSPoster(session, self.base_url)
-
-        # 登录后等待5秒并刷新页面（获取管理员权限）
         print("⏳ 等待5秒并刷新页面以获取管理员权限...")
         time.sleep(5)
         try:
@@ -158,22 +130,19 @@ class AutonomousBot:
             print("✅ 页面刷新成功")
         except:
             print("⚠️ 页面刷新失败，但继续运行")
-
         print(f"✅ 登录成功，用户ID: {self.user_id}")
         if self.admin_mk49_token:
             print("🔑 管理员删帖功能已启用")
         return True
 
     async def init_deepseek(self):
-        """初始化 DeepSeek 网页版连接器"""
-        headless = os.getenv("DS_HEADLESS", "False").lower() == "true"
+        headless = os.getenv("DS_HEADLESS", "True").lower() == "true"
         self.ds = DeepSeekConnector(
             username=os.getenv("DEEPSEEK_USERNAME"),
             password=os.getenv("DEEPSEEK_PASSWORD"),
             headless=headless
         )
         await self.ds.start()
-        # 关闭深度思考和联网搜索（可配置）
         deep_think = os.getenv("DS_DEEP_THINK", "False").lower() == "true"
         web_search = os.getenv("DS_WEB_SEARCH", "False").lower() == "true"
         await self.ds.set_deep_think(deep_think)
@@ -182,7 +151,6 @@ class AutonomousBot:
         print("✅ DeepSeek 网页版连接器已就绪")
 
     def get_new_threads(self):
-        """获取未处理的新帖子，跳过黑名单和最新N个"""
         new_threads = []
         for cat_id in self.target_categories:
             threads = self.poster.get_threads(self.token, category_id=cat_id, page_limit=30)
@@ -201,7 +169,6 @@ class AutonomousBot:
         return new_threads
 
     async def decide_action(self, context, is_thread=True):
-        """AI 决策，支持帖子上下文"""
         if is_thread:
             action_prompt = f"""
 你是一个论坛用户，你需要根据当前帖子决定做什么。
@@ -255,7 +222,7 @@ class AutonomousBot:
 【输出格式】
 只输出一个 JSON 对象。
 """
-        response = await self.ds.ask(action_prompt, max_wait=120)
+        response = await self.ds.ask(action_prompt, max_wait=180)
         try:
             json_match = re.search(r'\{.*\}', response, re.DOTALL)
             if json_match:
@@ -272,8 +239,6 @@ class AutonomousBot:
         if action == "ignore":
             print(f"⏭️ 忽略: {decision.get('reason', '无理由')}")
             return True
-
-        # 配额检查
         if action == "reply_to_thread" and self.reply_threads_count >= self.max_reply_threads:
             print("⚠️ 回复帖子配额已满，跳过")
             return False
@@ -310,7 +275,6 @@ class AutonomousBot:
             category_id = decision.get("category_id", 2)
             if not title or not content:
                 return False
-            # 每日发帖限制
             if self.today_posts_count >= self.daily_post_limit:
                 print(f"⚠️ 今日已达发帖上限 {self.daily_post_limit}，跳过创建新帖子")
                 return False
@@ -348,16 +312,12 @@ class AutonomousBot:
             return False
 
     async def run_once(self):
-        """单次运行：扫描帖子，AI决策并执行"""
         start_time = time.time()
         try:
             if not self.login():
                 return
-
             await self.init_deepseek()
             self._update_daily_stats()
-
-            # 扫描新帖子并处理
             new_threads = self.get_new_threads()
             print(f"📊 发现 {len(new_threads)} 个新帖子")
             for thread in new_threads:
@@ -373,12 +333,10 @@ class AutonomousBot:
                 decision = await self.decide_action(context, is_thread=True)
                 if decision.get("action") != "ignore":
                     self.execute_action(decision)
-                # 随机延迟 30~120 秒，避免过快
                 delay = random.uniform(30, 120)
                 print(f"⏳ 等待 {delay:.1f} 秒后继续...")
                 time.sleep(delay)
 
-            # 如果还有发帖配额，让AI决定是否发新帖
             if self.create_threads_count < self.max_create_threads and self.today_posts_count < self.daily_post_limit:
                 context = "现在你可以决定是否发布一个新帖子。如果没有合适的主题，可以选择 ignore。"
                 decision = await self.decide_action(context, is_thread=False)
