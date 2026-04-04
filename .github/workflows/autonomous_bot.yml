@@ -4,7 +4,7 @@ on:
   schedule:
     # 每天 UTC 0:00 运行（北京时间 08:00），可根据需要调整
     - cron: '0 0 * * *'
-  workflow_dispatch:
+  workflow_dispatch:  # 支持手动触发
 
 permissions:
   contents: write
@@ -25,6 +25,14 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libgtk-3-0 libnss3 libxss1 libasound2t64 libgbm1
+
+      - name: 缓存 DeepSeek 登录态
+        uses: actions/cache@v3
+        with:
+          path: deepseek_profile
+          key: deepseek-profile-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            deepseek-profile-${{ runner.os }}-
 
       - name: 安装 Python 依赖
         run: |
