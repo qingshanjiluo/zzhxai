@@ -21,21 +21,24 @@ class AutonomousBot:
         # 监控板块
         target_categories_str = os.getenv("TARGET_CATEGORIES", "2,5")
         self.target_categories = [int(x) for x in target_categories_str.split(",") if x.strip()]
-        self.skip_latest = int(os.getenv("SKIP_LATEST", "5"))
+        self.skip_latest = int(os.getenv("SKIP_LATEST", "1"))
         self.login_retries = int(os.getenv("LOGIN_RETRIES", "50"))
 
-        # 黑名单帖子ID（不评论）
+        # 黑名单帖子ID
         blacklist_str = os.getenv("BLACKLIST_THREAD_IDS", "")
         self.blacklist_threads = [int(x) for x in blacklist_str.split(",") if x.strip()]
 
         # 操作配额
-        self.max_reply_threads = int(os.getenv("MAX_REPLY_THREADS", "10"))
-        self.max_reply_comments = int(os.getenv("MAX_REPLY_COMMENTS", "5"))
-        self.max_create_threads = int(os.getenv("MAX_CREATE_THREADS", "1"))
-        self.daily_post_limit = int(os.getenv("DAILY_POST_LIMIT", "5"))
+        self.max_reply_threads = int(os.getenv("MAX_REPLY_THREADS", "15"))
+        self.max_reply_comments = int(os.getenv("MAX_REPLY_COMMENTS", "10"))
+        self.max_create_threads = int(os.getenv("MAX_CREATE_THREADS", "2"))
+        self.daily_post_limit = int(os.getenv("DAILY_POST_LIMIT", "10"))
 
-        # 点赞概率（AI 决策，但可设置偏好）
-        self.like_preference = float(os.getenv("LIKE_PREFERENCE", "0.3"))  # AI 在决策时会更倾向于点赞的概率
+        # 评论数阈值（超过10跳过）
+        self.max_comments_to_skip = int(os.getenv("MAX_COMMENTS_TO_SKIP", "10"))
+
+        # 总运行时长目标（秒）
+        self.target_duration = int(os.getenv("TARGET_DURATION_SECONDS", "1800"))  # 默认30分钟
 
         # DeepSeek API 客户端
         api_key = os.getenv("DEEPSEEK_API_KEY")
@@ -43,7 +46,7 @@ class AutonomousBot:
             raise ValueError("请设置 DEEPSEEK_API_KEY")
         self.client = DeepSeekClient(api_key=api_key)
 
-        # 加载风格（可选，用于提示词）
+        # 加载风格
         self.style = self._load_file("style.txt", "你是论坛管理员，幽默风趣。")
 
         # 状态持久化
@@ -70,7 +73,7 @@ class AutonomousBot:
     def _load_state(self):
         default = {
             "processed_threads": [],
-            "processed_posts": [],      # 已处理的评论ID
+            "processed_posts": [],
             "action_logs": [],
             "daily_stats": {},
             "last_run": None
@@ -102,8 +105,8 @@ class AutonomousBot:
             "success": success
         }
         self.state["action_logs"].append(log_entry)
-        if len(self.state["action_logs"]) > 100:
-            self.state["action_logs"] = self.state["action_logs"][-100:]
+        if len(self.state["action_logs"]) > 200:
+            self.state["action_logs"] = self.state["action_logs"][-200:]
         self._save_state()
 
     def _update_daily_stats(self):
@@ -151,7 +154,7 @@ class AutonomousBot:
         return True
 
     def get_threads_with_comments(self, category_id, limit=30):
-        """获取板块内的帖子，并附加评论列表（仅限评论数 ≤ 10 的帖子）"""
+        """获取板块内的帖子，仅保留评论数 ≤ max_comments_to_skip 的帖子"""
         threads = self.poster.get_threads(self.token, category_id=category_id, page_limit=limit)
         if not isinstance(threads, list):
             return []
@@ -159,15 +162,14 @@ class AutonomousBot:
         result = []
         for t in threads:
             tid = int(t.get('id'))
-            # 跳过已处理、黑名单、置顶帖（可选）
             if tid in self.state['processed_threads']:
                 continue
             if tid in self.blacklist_threads:
                 continue
-            # 获取所有评论（包括嵌套）
             all_comments = self._get_all_comments(tid)
-            if len(all_comments) > 10:
-                print(f"⏭️ 帖子 {tid} 评论数 {len(all_comments)} > 10，跳过")
+            comment_count = len(all_comments)
+            if comment_count > self.max_comments_to_skip:
+                print(f"⏭️ 帖子 {tid} 评论数 {comment_count} > {self.max_comments_to_skip}，跳过")
                 continue
             result.append({
                 "thread": t,
@@ -176,9 +178,7 @@ class AutonomousBot:
         return result
 
     def _get_all_comments(self, thread_id):
-        """递归获取帖子下所有评论（扁平列表，每条包含 id, content, user_nickname, reply_to_post_id）"""
         comments = []
-        # 一级评论
         first_level = self.poster.get_post_comments(self.token, thread_id)
         for c in first_level:
             comments.append({
@@ -187,13 +187,11 @@ class AutonomousBot:
                 "user_nickname": c.get('user', {}).get('nickname', '未知'),
                 "reply_to_post_id": None
             })
-            # 递归获取回复
             replies = self._get_replies(c['id'])
             comments.extend(replies)
         return comments
 
     def _get_replies(self, post_id):
-        """获取某条评论的所有回复（嵌套）"""
         replies = []
         resp = self.poster.get_comment_replies(self.token, post_id)
         for r in resp:
@@ -203,18 +201,16 @@ class AutonomousBot:
                 "user_nickname": r.get('user', {}).get('nickname', '未知'),
                 "reply_to_post_id": r.get('reply_to_post_id')
             })
-            # 如果还有更深层的回复，继续递归（限制深度，这里假设最多2层）
             deeper = self._get_replies(r['id'])
             replies.extend(deeper)
         return replies
 
     def decide_action(self, thread, comments):
-        """AI 决策：是否回复帖子、回复某条评论、点赞、发新帖"""
-        # 构建简洁的上下文
+        """AI 决策，强制要求尽量不忽略"""
         context = f"帖子标题：{thread['title']}\n帖子内容：{thread.get('content', '')}\n"
         if comments:
             context += "\n现有评论（按时间顺序）：\n"
-            for idx, c in enumerate(comments[:10]):  # 最多展示10条评论
+            for idx, c in enumerate(comments[:15]):
                 context += f"评论{idx+1} (ID:{c['id']}, 作者:{c['user_nickname']}): {c['content'][:100]}\n"
                 if c['reply_to_post_id']:
                     context += f"  ↳ 回复评论ID: {c['reply_to_post_id']}\n"
@@ -224,36 +220,37 @@ class AutonomousBot:
         prompt = f"""
 {self.style}
 
-请根据以上帖子内容和评论，决定你要做什么。你可以：
+**重要：这个帖子的评论数少于10条，你必须做出回应，不要忽略！**
+
+请根据以上帖子内容和评论，选择以下操作之一：
 - 回复帖子（作为新评论）
-- 回复某条评论（需要提供评论ID和回复内容）
+- 回复某条评论（提供评论ID）
 - 给帖子点赞
-- 发布一个新帖子（需要标题和内容）
-- 什么都不做
+- 发布一个新帖子（标题和内容）
 
-注意：你的回复应简短幽默（不超过50字）。如果选择回复评论，请指明评论ID。
+你的回复应简短幽默（不超过60字）。**强烈建议回复帖子或评论**。
 
-输出格式（只输出JSON，不要其他文字）：
+输出格式（只输出JSON）：
 {{"action": "reply_to_thread", "content": "回复内容"}}
 {{"action": "reply_to_comment", "post_id": 12345, "content": "回复内容"}}
 {{"action": "like_thread"}}
 {{"action": "create_thread", "title": "标题", "content": "内容"}}
-{{"action": "ignore"}}
 """
-        response = self.client.generate(prompt, max_tokens=150, temperature=0.8)
+        response = self.client.generate(prompt, max_tokens=150, temperature=0.9)
         try:
             json_match = re.search(r'\{.*\}', response, re.DOTALL)
             if json_match:
                 return json.loads(json_match.group())
             else:
-                return {"action": "ignore"}
+                return {"action": "reply_to_thread", "content": "有意思，支持一下！"}
         except:
-            return {"action": "ignore"}
+            return {"action": "reply_to_thread", "content": "有意思，支持一下！"}
 
     def execute_action(self, thread_id, decision, comments):
         action = decision.get("action")
         if action == "ignore":
-            return False
+            action = "reply_to_thread"
+            decision["content"] = decision.get("content", "有点意思，支持一下！")
 
         # 配额检查
         if action == "reply_to_thread" and self.reply_threads_count >= self.max_reply_threads:
@@ -272,7 +269,7 @@ class AutonomousBot:
         if action == "reply_to_thread":
             content = decision.get("content", "")
             if not content:
-                return False
+                content = "支持一下！"
             success = self.poster.create_comment(self.token, thread_id, content)
             if success:
                 self.reply_threads_count += 1
@@ -285,10 +282,9 @@ class AutonomousBot:
 
         elif action == "reply_to_comment":
             post_id = decision.get("post_id")
-            content = decision.get("content")
+            content = decision.get("content", "")
             if not post_id or not content:
                 return False
-            # 查找该评论是否存在，以及是否需要传入 reply_to_post_id（如果是嵌套回复）
             reply_to = None
             for c in comments:
                 if c['id'] == post_id and c['reply_to_post_id']:
@@ -297,7 +293,6 @@ class AutonomousBot:
             if success:
                 self.reply_comments_count += 1
                 self._log_action("reply_to_comment", post_id, content, True)
-                # 标记该评论已处理（避免重复回复）
                 self.state["processed_posts"].append(post_id)
                 self._save_state()
             else:
@@ -314,7 +309,7 @@ class AutonomousBot:
             content = decision.get("content", "")
             if not title or not content:
                 return False
-            success, _ = self.poster.create_thread(self.token, 2, title, content)  # 默认板块2
+            success, _ = self.poster.create_thread(self.token, 2, title, content)
             if success:
                 self.create_threads_count += 1
                 self._increment_daily_count()
@@ -333,22 +328,53 @@ class AutonomousBot:
                 return
             self._update_daily_stats()
 
+            # 收集所有待处理的帖子（跨板块）
+            all_items = []
             for cat_id in self.target_categories:
+                print(f"📂 扫描板块 {cat_id}")
+                items = self.get_threads_with_comments(cat_id, limit=30)
+                all_items.extend(items)
+                # 如果已经达到配额上限，停止扫描
+                if (self.reply_threads_count >= self.max_reply_threads and
+                    self.reply_comments_count >= self.reply_comments_count and
+                    self.create_threads_count >= self.max_create_threads):
+                    break
+
+            total_items = len(all_items)
+            if total_items == 0:
+                print("⚠️ 没有找到符合条件的帖子，运行结束。")
+                return
+
+            # 动态计算每个帖子之间的间隔，使总运行时间接近 target_duration
+            # 减去已消耗的时间（登录等），剩余时间分配给所有帖子
+            elapsed_before = time.time() - start_time
+            remaining_seconds = max(10, self.target_duration - elapsed_before)
+            interval_per_item = remaining_seconds / total_items
+            # 限制最大间隔为 180 秒，最小为 10 秒
+            interval_per_item = min(180, max(10, interval_per_item))
+            print(f"📊 共 {total_items} 个待处理帖子，计划每个间隔约 {interval_per_item:.1f} 秒")
+
+            for idx, item in enumerate(all_items):
+                # 检查是否已超过配额（回复帖子、评论、发帖）
                 if (self.reply_threads_count >= self.max_reply_threads and
                     self.reply_comments_count >= self.max_reply_comments and
                     self.create_threads_count >= self.max_create_threads):
+                    print("✅ 所有配额已用完，提前结束")
                     break
-                print(f"📂 扫描板块 {cat_id}")
-                items = self.get_threads_with_comments(cat_id, limit=20)
-                for item in items:
-                    thread = item['thread']
-                    comments = item['comments']
-                    tid = thread['id']
-                    print(f"📄 帖子: {thread['title']} (ID:{tid}) 评论数:{len(comments)}")
-                    decision = self.decide_action(thread, comments)
-                    if decision.get("action") != "ignore":
-                        self.execute_action(tid, decision, comments)
-                    time.sleep(random.uniform(2, 5))
+
+                thread = item['thread']
+                comments = item['comments']
+                tid = thread['id']
+                print(f"📄 帖子: {thread['title']} (ID:{tid}) 评论数:{len(comments)}")
+                decision = self.decide_action(thread, comments)
+                self.execute_action(tid, decision, comments)
+
+                # 如果不是最后一个帖子，则等待动态计算的时间
+                if idx < total_items - 1:
+                    wait_time = interval_per_item + random.uniform(-5, 5)
+                    wait_time = max(5, wait_time)
+                    print(f"⏳ 等待 {wait_time:.1f} 秒后处理下一个帖子...")
+                    time.sleep(wait_time)
 
             elapsed = time.time() - start_time
             print(f"✅ 运行完成，耗时 {elapsed/60:.1f} 分钟")
