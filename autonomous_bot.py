@@ -1,360 +1,153 @@
 import asyncio
 import os
-import json
-import time
-import re
 import random
-import traceback
-from datetime import datetime, date
-from login import BBSTurkeyBotLogin
-from post import BBSPoster
-from deepseek_connector import DeepSeekConnector
+import time
+from playwright.async_api import async_playwright, BrowserContext, Page
+from playwright_stealth import Stealth
 
-class AutonomousBot:
-    def __init__(self):
-        # 论坛配置
-        self.base_url = os.getenv("BASE_URL", "https://mbbs.zdjl.site/mk48by049.mbbs.cc")
-        self.username = os.getenv("BOT_USERNAME")
-        self.password = os.getenv("BOT_PASSWORD")
+class DeepSeekConnector:
+    """深度优化版 DeepSeek 网页版自动登录与问答连接器"""
+
+    def __init__(self, username: str = None, password: str = None, headless: bool = False):
+        self.username = username or os.getenv("DEEPSEEK_USERNAME")
+        self.password = password or os.getenv("DEEPSEEK_PASSWORD")
         if not self.username or not self.password:
-            raise ValueError("请设置 BOT_USERNAME 和 BOT_PASSWORD 环境变量")
+            raise ValueError("请提供 DeepSeek 账号密码，或设置环境变量 DEEPSEEK_USERNAME 和 DEEPSEEK_PASSWORD")
+        self.headless = headless
+        self._playwright = None
+        self._context: BrowserContext = None
+        self._page: Page = None
+        self._logged_in = False
+        self._user_data_dir = os.getenv("DEEPSEEK_PROFILE_DIR", "./deepseek_profile")
 
-        target_categories_str = os.getenv("TARGET_CATEGORIES", "2,5")
-        self.target_categories = [int(x) for x in target_categories_str.split(",") if x.strip()]
-        skip_latest_str = os.getenv("SKIP_LATEST", "5")
-        self.skip_latest = int(skip_latest_str) if skip_latest_str else 5
-        login_retries_str = os.getenv("LOGIN_RETRIES", "50")
-        self.login_retries = int(login_retries_str) if login_retries_str else 50
-        self.admin_mk49_token = os.getenv("ADMIN_MK49_TOKEN")
-        blacklist_str = os.getenv("BLACKLIST_USER_IDS", "")
-        self.blacklist = [int(x) for x in blacklist_str.split(",") if x.strip()]
-        self.style = self._load_file("style.txt", "你是一个论坛用户，回复风格幽默风趣。")
-        self.background = self._load_file("mk48.txt", "")
-        self.state_file = "state.json"
-        self.state = self._load_state()
-        max_reply_threads_str = os.getenv("MAX_REPLY_THREADS", "15")
-        self.max_reply_threads = int(max_reply_threads_str) if max_reply_threads_str else 15
-        max_create_threads_str = os.getenv("MAX_CREATE_THREADS", "1")
-        self.max_create_threads = int(max_create_threads_str) if max_create_threads_str else 1
-        daily_limit_str = os.getenv("DAILY_POST_LIMIT", "10")
-        self.daily_post_limit = int(daily_limit_str) if daily_limit_str else 10
-        self.reply_threads_count = 0
-        self.create_threads_count = 0
-        self.today_posts_count = 0
-        self.ds = None
-        self.token = None
-        self.user_id = None
-        self.session = None
-        self.poster = None
-
-    def _load_file(self, filename, default):
-        if os.path.exists(filename):
-            with open(filename, 'r', encoding='utf-8') as f:
-                return f.read()
-        return default
-
-    def _load_state(self):
-        default = {
-            "processed_threads": [],
-            "action_logs": [],
-            "daily_stats": {},
-            "last_run": None
-        }
-        if os.path.exists(self.state_file):
-            with open(self.state_file, 'r', encoding='utf-8') as f:
-                state = json.load(f)
-            for key, value in default.items():
-                if key not in state:
-                    state[key] = value
-            if "processed_threads" in state:
-                state["processed_threads"] = [int(x) for x in state["processed_threads"]]
-            return state
-        return default
-
-    def _save_state(self):
-        self.state["last_run"] = datetime.now().isoformat()
-        with open(self.state_file, 'w', encoding='utf-8') as f:
-            json.dump(self.state, f, indent=2, ensure_ascii=False)
-
-    def _log_action(self, action_type, target, content, success):
-        log_entry = {
-            "timestamp": datetime.now().isoformat(),
-            "type": action_type,
-            "target": target,
-            "content": content[:100] if content else "",
-            "success": success
-        }
-        self.state["action_logs"].append(log_entry)
-        if len(self.state["action_logs"]) > 100:
-            self.state["action_logs"] = self.state["action_logs"][-100:]
-        self._save_state()
-
-    def _update_daily_stats(self):
-        today = date.today().isoformat()
-        if today not in self.state["daily_stats"]:
-            self.state["daily_stats"][today] = {"posts": 0}
-        self.today_posts_count = self.state["daily_stats"][today]["posts"]
-
-    def _increment_daily_count(self):
-        today = date.today().isoformat()
-        if today not in self.state["daily_stats"]:
-            self.state["daily_stats"][today] = {"posts": 0}
-        self.state["daily_stats"][today]["posts"] += 1
-        self.today_posts_count = self.state["daily_stats"][today]["posts"]
-        self._save_state()
-
-    def login(self):
-        print(f"🔐 登录账号: {self.username}")
-        login_bot = BBSTurkeyBotLogin(
-            base_url=self.base_url,
-            username=self.username,
-            password=self.password,
-            max_retries=self.login_retries
+    async def start(self):
+        """使用持久化上下文启动浏览器，隐藏自动化指纹"""
+        self._playwright = await async_playwright().start()
+        # 关键优化：使用持久化上下文 + 真实浏览器参数
+        self._context = await self._playwright.chromium.launch_persistent_context(
+            user_data_dir=self._user_data_dir,
+            headless=self.headless,
+            viewport={'width': 1280, 'height': 800},
+            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            locale='zh-CN',
+            timezone_id='Asia/Shanghai',
+            args=[
+                '--disable-blink-features=AutomationControlled',
+                '--disable-features=IsolateOrigins,site-per-process',
+                '--no-sandbox',
+                '--disable-setuid-sandbox'
+            ]
         )
-        success, result, session = login_bot.login_with_retry()
-        if not success:
-            print("❌ 登录失败")
-            return False
-        user_data = result.get('data', {})
-        self.token = user_data.get('token')
-        self.user_id = user_data.get('id')
-        if not self.token or not self.user_id:
-            print("❌ 登录响应缺少 token 或 user_id")
-            return False
-        self.session = session
-        self.poster = BBSPoster(session, self.base_url)
-        print("⏳ 等待5秒并刷新页面以获取管理员权限...")
-        time.sleep(5)
+        self._page = await self._context.new_page()
+        await self._login()
+
+    async def _login(self):
+        """执行或复用登录流程，应用反检测隐身技术"""
+        # 访问首页
+        await self._page.goto("https://chat.deepseek.com/")
+        await self._page.wait_for_load_state("networkidle")
+        # 模拟人类首次访问的随机停留
+        await asyncio.sleep(random.uniform(1.5, 3.5))
+
+        # 检查是否已经登录（通过 URL 或页面元素）
+        if "sign_in" in self._page.url:
+            print("🔐 未检测到登录状态，开始自动登录...")
+            # 应用 playwright_stealth 隐藏自动化特征
+            await Stealth().apply_stealth_async(self._page)
+
+            # 等待登录表单出现
+            await self._page.wait_for_selector("input[placeholder*='手机号/邮箱'], input[type='email']", timeout=15000)
+            # 模拟人类输入账号
+            await self._page.fill("input[placeholder*='手机号/邮箱'], input[type='email']", self.username)
+            await asyncio.sleep(random.uniform(0.3, 0.8))
+            # 模拟人类输入密码
+            await self._page.fill("input[type='password']", self.password)
+            await asyncio.sleep(random.uniform(0.3, 0.8))
+            # 点击登录按钮
+            await self._page.click("button:has-text('登录')")
+            # 等待登录成功跳转
+            try:
+                await self._page.wait_for_url("**/chat*", timeout=60000)
+                print("✅ 登录成功，状态已持久化。")
+            except:
+                # 如果跳转失败，检查是否有验证码等
+                print("⚠️ 登录可能失败，请检查账号或是否存在验证码")
+                raise
+        else:
+            print("✅ 检测到有效登录状态，直接使用。")
+
+        # 等待聊天界面完全加载
+        await self._page.wait_for_selector("textarea[placeholder*='提问']", timeout=30000)
+        self._logged_in = True
+
+    async def set_deep_think(self, enable: bool = False):
+        """设置深度思考开关（默认关闭）"""
         try:
-            self.session.get(self.base_url, timeout=10)
-            print("✅ 页面刷新成功")
+            # 深度思考按钮可能通过 role 或文本定位
+            btn = await self._page.query_selector("button[aria-label*='深度思考'], text=深度思考")
+            if btn:
+                is_active = await btn.get_attribute("aria-checked")
+                if (enable and is_active != "true") or (not enable and is_active == "true"):
+                    await btn.click()
+                    print(f"🔘 深度思考已{'开启' if enable else '关闭'}")
+        except Exception as e:
+            print(f"⚠️ 设置深度思考失败: {e}")
+
+    async def set_web_search(self, enable: bool = False):
+        """设置联网搜索开关（默认关闭）"""
+        try:
+            btn = await self._page.query_selector("button[aria-label*='联网搜索'], text=联网搜索")
+            if btn:
+                is_active = await btn.get_attribute("aria-checked")
+                if (enable and is_active != "true") or (not enable and is_active == "true"):
+                    await btn.click()
+                    print(f"🔘 联网搜索已{'开启' if enable else '关闭'}")
+        except Exception as e:
+            print(f"⚠️ 设置联网搜索失败: {e}")
+
+    async def new_conversation(self):
+        """新建对话，清空上下文"""
+        try:
+            # 新建对话按钮
+            await self._page.click("button:has-text('新建对话')", timeout=10000)
+            await asyncio.sleep(1)
+            print("🔄 已新建对话")
+        except Exception as e:
+            print(f"⚠️ 新建对话失败（可能已在新建状态）: {e}")
+
+    async def ask(self, question: str, max_wait: int = 180) -> str:
+        """发送问题并等待回答完成"""
+        if not self._logged_in:
+            raise RuntimeError("未登录，请先调用 start()")
+        # 定位输入框
+        input_area = await self._page.wait_for_selector("textarea[placeholder*='提问']", timeout=15000)
+        # 模拟人类输入，加入随机延迟
+        await input_area.fill(question)
+        await asyncio.sleep(random.uniform(0.2, 0.5))
+        await input_area.press("Enter")
+        print(f"📤 已发送问题: {question[:50]}...")
+
+        # 等待回答开始生成（出现“停止生成”按钮）
+        try:
+            await self._page.wait_for_selector("button:has-text('停止生成')", timeout=15000)
         except:
-            print("⚠️ 页面刷新失败，但继续运行")
-        print(f"✅ 登录成功，用户ID: {self.user_id}")
-        if self.admin_mk49_token:
-            print("🔑 管理员删帖功能已启用")
-        return True
-
-    async def init_deepseek(self):
-        headless = os.getenv("DS_HEADLESS", "True").lower() == "true"
-        self.ds = DeepSeekConnector(
-            username=os.getenv("DEEPSEEK_USERNAME"),
-            password=os.getenv("DEEPSEEK_PASSWORD"),
-            headless=headless
-        )
-        await self.ds.start()
-        deep_think = os.getenv("DS_DEEP_THINK", "False").lower() == "true"
-        web_search = os.getenv("DS_WEB_SEARCH", "False").lower() == "true"
-        await self.ds.set_deep_think(deep_think)
-        await self.ds.set_web_search(web_search)
-        await self.ds.new_conversation()
-        print("✅ DeepSeek 网页版连接器已就绪")
-
-    def get_new_threads(self):
-        new_threads = []
-        for cat_id in self.target_categories:
-            threads = self.poster.get_threads(self.token, category_id=cat_id, page_limit=30)
-            if not isinstance(threads, list):
-                continue
-            threads_to_process = threads[self.skip_latest:]
-            for t in threads_to_process:
-                tid = int(t.get('id'))
-                author_id = int(t.get('user_id', 0))
-                if tid in self.state['processed_threads']:
-                    continue
-                if author_id in self.blacklist:
-                    print(f"  跳过黑名单用户 {author_id} 的帖子: {t['title'][:30]}")
-                    continue
-                new_threads.append(t)
-        return new_threads
-
-    async def decide_action(self, context, is_thread=True):
-        if is_thread:
-            action_prompt = f"""
-你是一个论坛用户，你需要根据当前帖子决定做什么。
-
-【你的角色风格】
-{self.style}
-
-【背景知识】
-{self.background}
-
-【帖子详情】
-{context}
-
-【操作配额】（已执行次数/总限额）
-- 回复帖子：{self.reply_threads_count}/{self.max_reply_threads}
-- 发布新帖：{self.create_threads_count}/{self.max_create_threads}
-
-【你可以执行的操作】
-- reply_to_thread: 回复帖子（需要 thread_id 和回复内容）
-- like_thread: 给帖子点赞（thread_id）
-- create_thread: 发布新帖子（需要 title, content, category_id）
-- set_essence: 给帖子加精（thread_id，需管理员权限）
-- delete_thread: 删除帖子（thread_id，需管理员权限，仅在必要时使用）
-- ignore: 不采取任何行动
-
-【注意】你只能回复帖子本身，不能回复评论。如果配额已满，则只能 ignore。
-
-【输出格式】
-只输出一个 JSON 对象。
-"""
-        else:
-            action_prompt = f"""
-你是一个论坛用户，你需要根据当前情况决定做什么。
-
-【你的角色风格】
-{self.style}
-
-【背景知识】
-{self.background}
-
-【当前情况】
-{context}
-
-【操作配额】（已执行次数/总限额）
-- 发布新帖：{self.create_threads_count}/{self.max_create_threads}
-
-【你可以执行的操作】
-- create_thread: 发布新帖子（需要 title, content, category_id）
-- ignore: 不采取任何行动
-
-【输出格式】
-只输出一个 JSON 对象。
-"""
-        response = await self.ds.ask(action_prompt, max_wait=180)
+            pass
+        # 等待回答完成（“停止生成”按钮消失）
         try:
-            json_match = re.search(r'\{.*\}', response, re.DOTALL)
-            if json_match:
-                return json.loads(json_match.group())
-            else:
-                print("AI 返回非 JSON，使用默认忽略")
-                return {"action": "ignore", "reason": "解析失败"}
-        except Exception as e:
-            print(f"解析 AI 决策失败: {e}")
-            return {"action": "ignore", "reason": "解析异常"}
+            await self._page.wait_for_selector("button:has-text('停止生成')", state="hidden", timeout=max_wait * 1000)
+        except:
+            pass
+        # 获取最后一个助手的回答
+        assistant_messages = await self._page.query_selector_all("div[class*='message'][class*='assistant']")
+        if assistant_messages:
+            last = assistant_messages[-1]
+            answer = await last.inner_text()
+            return answer.strip()
+        return "未获取到回答"
 
-    def execute_action(self, decision):
-        action = decision.get("action")
-        if action == "ignore":
-            print(f"⏭️ 忽略: {decision.get('reason', '无理由')}")
-            return True
-        if action == "reply_to_thread" and self.reply_threads_count >= self.max_reply_threads:
-            print("⚠️ 回复帖子配额已满，跳过")
-            return False
-        if action == "create_thread" and self.create_threads_count >= self.max_create_threads:
-            print("⚠️ 发布新帖配额已满，跳过")
-            return False
-
-        if action == "reply_to_thread":
-            thread_id = decision.get("thread_id")
-            content = decision.get("content")
-            if not thread_id or not content:
-                return False
-            success = self.poster.create_comment(self.token, thread_id, content)
-            if success:
-                self.state["processed_threads"].append(thread_id)
-                self.reply_threads_count += 1
-                self._log_action("reply_to_thread", thread_id, content, True)
-                self._save_state()
-            else:
-                self._log_action("reply_to_thread", thread_id, content, False)
-            return success
-
-        elif action == "like_thread":
-            thread_id = decision.get("thread_id")
-            if not thread_id:
-                return False
-            success = self.poster.set_thread_like(self.token, thread_id, like=True)
-            self._log_action("like_thread", thread_id, "", success)
-            return success
-
-        elif action == "create_thread":
-            title = decision.get("title")
-            content = decision.get("content")
-            category_id = decision.get("category_id", 2)
-            if not title or not content:
-                return False
-            if self.today_posts_count >= self.daily_post_limit:
-                print(f"⚠️ 今日已达发帖上限 {self.daily_post_limit}，跳过创建新帖子")
-                return False
-            success, _ = self.poster.create_thread(self.token, category_id, title, content)
-            if success:
-                self.create_threads_count += 1
-                self._increment_daily_count()
-                self._log_action("create_thread", f"cat{category_id}", title, True)
-                self._save_state()
-            else:
-                self._log_action("create_thread", f"cat{category_id}", title, False)
-            return success
-
-        elif action == "set_essence":
-            thread_id = decision.get("thread_id")
-            if not thread_id:
-                return False
-            success = self.poster.set_essence(self.token, thread_id, is_essence=True)
-            self._log_action("set_essence", thread_id, "", success)
-            return success
-
-        elif action == "delete_thread":
-            if not self.admin_mk49_token:
-                print("❌ 管理员删帖需要 ADMIN_MK49_TOKEN 环境变量")
-                return False
-            thread_id = decision.get("thread_id")
-            if not thread_id:
-                return False
-            success = self.poster.delete_thread_admin(thread_id, self.admin_mk49_token)
-            self._log_action("delete_thread", thread_id, "", success)
-            return success
-
-        else:
-            print(f"未知操作: {action}")
-            return False
-
-    async def run_once(self):
-        start_time = time.time()
-        try:
-            if not self.login():
-                return
-            await self.init_deepseek()
-            self._update_daily_stats()
-            new_threads = self.get_new_threads()
-            print(f"📊 发现 {len(new_threads)} 个新帖子")
-            for thread in new_threads:
-                if self.reply_threads_count >= self.max_reply_threads:
-                    break
-                print(f"📄 分析帖子: {thread['title']} (ID: {thread['id']})")
-                context = f"""
-标题：{thread['title']}
-内容：{thread.get('content', '')}
-发布者：{thread.get('user', {}).get('nickname', '未知')}
-帖子ID：{thread['id']}
-"""
-                decision = await self.decide_action(context, is_thread=True)
-                if decision.get("action") != "ignore":
-                    self.execute_action(decision)
-                delay = random.uniform(30, 120)
-                print(f"⏳ 等待 {delay:.1f} 秒后继续...")
-                time.sleep(delay)
-
-            if self.create_threads_count < self.max_create_threads and self.today_posts_count < self.daily_post_limit:
-                context = "现在你可以决定是否发布一个新帖子。如果没有合适的主题，可以选择 ignore。"
-                decision = await self.decide_action(context, is_thread=False)
-                if decision.get("action") == "create_thread":
-                    self.execute_action(decision)
-
-            elapsed = time.time() - start_time
-            print(f"✅ 本轮运行完成，耗时 {elapsed/60:.1f} 分钟")
-            print(f"📊 统计: 回复帖子 {self.reply_threads_count}/{self.max_reply_threads}, "
-                  f"发布新帖 {self.create_threads_count}/{self.max_create_threads}")
-        except Exception as e:
-            print(f"❌ 运行过程中发生错误: {e}")
-            traceback.print_exc()
-        finally:
-            if self.ds:
-                await self.ds.close()
-            self._save_state()
-
-if __name__ == "__main__":
-    bot = AutonomousBot()
-    asyncio.run(bot.run_once())
+    async def close(self):
+        """关闭浏览器上下文"""
+        if self._context:
+            await self._context.close()
+        if self._playwright:
+            await self._playwright.stop()
