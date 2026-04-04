@@ -2,4 +2,5 @@ requests==2.31.0
 ddddocr
 cairosvg
 playwright==1.40.0
+playwright-stealth
 pillow
