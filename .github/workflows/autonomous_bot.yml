@@ -2,7 +2,8 @@ name: 自主论坛AI代理
 
 on:
   schedule:
-    - cron: '0 22,23,3,4,5,9,11,14 * * *'
+    # 每天 UTC 0:00 运行（北京时间 08:00），可根据需要调整
+    - cron: '0 0 * * *'
   workflow_dispatch:
 
 permissions:
@@ -14,29 +15,47 @@ jobs:
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
-      - name: 设置 Python
+
+      - name: 设置 Python 环境
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-      - name: 安装系统依赖
+
+      - name: 安装系统依赖（Playwright 和验证码识别所需）
         run: |
           sudo apt-get update
           sudo apt-get install -y libgtk-3-0 libnss3 libxss1 libasound2t64 libgbm1
+
       - name: 安装 Python 依赖
-        run: pip install -r requirements.txt
+        run: |
+          pip install -r requirements.txt
+
       - name: 安装 Playwright 浏览器
-        run: playwright install chromium
+        run: |
+          playwright install chromium
+
       - name: 运行自主代理
         env:
           BOT_USERNAME: ${{ secrets.BOT_USERNAME }}
           BOT_PASSWORD: ${{ secrets.BOT_PASSWORD }}
-          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           BASE_URL: ${{ secrets.BASE_URL }}
           TARGET_CATEGORIES: ${{ secrets.TARGET_CATEGORIES }}
-          MAX_ACTIONS_PER_RUN: ${{ secrets.MAX_ACTIONS_PER_RUN }}
+          SKIP_LATEST: ${{ secrets.SKIP_LATEST }}
+          LOGIN_RETRIES: ${{ secrets.LOGIN_RETRIES }}
+          MAX_REPLY_THREADS: ${{ secrets.MAX_REPLY_THREADS }}
+          MAX_CREATE_THREADS: ${{ secrets.MAX_CREATE_THREADS }}
           DAILY_POST_LIMIT: ${{ secrets.DAILY_POST_LIMIT }}
+          BLACKLIST_USER_IDS: ${{ secrets.BLACKLIST_USER_IDS }}
           ADMIN_MK49_TOKEN: ${{ secrets.ADMIN_MK49_TOKEN }}
-        run: python autonomous_bot.py
+          # DeepSeek 网页版登录信息
+          DEEPSEEK_USERNAME: ${{ secrets.DEEPSEEK_USERNAME }}
+          DEEPSEEK_PASSWORD: ${{ secrets.DEEPSEEK_PASSWORD }}
+          DS_HEADLESS: ${{ secrets.DS_HEADLESS }}
+          DS_DEEP_THINK: ${{ secrets.DS_DEEP_THINK }}
+          DS_WEB_SEARCH: ${{ secrets.DS_WEB_SEARCH }}
+        run: |
+          python autonomous_bot.py
+
       - name: 提交状态文件
         run: |
           git config user.name "github-actions[bot]"
