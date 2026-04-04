@@ -1,10 +1,9 @@
-# deepseek_connector.py
 import asyncio
 import os
-from playwright.async_api import async_playwright, Page, Browser
+from playwright.async_api import async_playwright, Page, Browser, TimeoutError as PlaywrightTimeoutError
 
 class DeepSeekConnector:
-    """DeepSeek 网页版自动登录与问答（优化版）"""
+    """DeepSeek 网页版自动登录与问答（优化版，增强超时处理）"""
 
     def __init__(self, username: str = None, password: str = None, headless: bool = False):
         self.username = username or os.getenv("DEEPSEEK_USERNAME")
@@ -18,36 +17,59 @@ class DeepSeekConnector:
         self._logged_in = False
 
     async def start(self):
+        """启动浏览器并自动登录"""
         self._playwright = await async_playwright().start()
-        self._browser = await self._playwright.chromium.launch(headless=self.headless)
+        self._browser = await self._playwright.chromium.launch(headless=self.headless, args=['--no-sandbox'])
         self._page = await self._browser.new_page()
         await self._login()
 
     async def _login(self):
         print("🔐 正在打开登录页面...")
-        await self._page.goto("https://platform.deepseek.com/sign_in")
-        await self._page.wait_for_load_state("networkidle")
-        # 点击“密码登录”（如果需要）
+        try:
+            await self._page.goto("https://platform.deepseek.com/sign_in", timeout=60000)
+            await self._page.wait_for_load_state("networkidle", timeout=30000)
+        except PlaywrightTimeoutError:
+            print("⚠️ 页面加载超时，请检查网络连接")
+            raise
+
+        # 尝试点击“密码登录”按钮（若存在）
         try:
             password_login_btn = await self._page.query_selector("text=密码登录")
             if password_login_btn and await password_login_btn.is_visible():
                 await password_login_btn.click()
                 print("👉 已点击“密码登录”")
                 await self._page.wait_for_timeout(1000)
-        except:
-            pass
-        await self._page.wait_for_selector("input[placeholder*='手机号/邮箱']", timeout=10000)
+        except Exception as e:
+            print(f"点击密码登录按钮失败（可忽略）: {e}")
+
+        # 等待账号输入框出现（增加超时时间）
+        try:
+            await self._page.wait_for_selector("input[placeholder*='手机号/邮箱']", timeout=30000)
+        except PlaywrightTimeoutError:
+            print("❌ 未找到账号输入框，登录页面可能已变更")
+            raise
+
         await self._page.fill("input[placeholder*='手机号/邮箱']", self.username)
         await self._page.fill("input[type='password']", self.password)
         await self._page.click("button:has-text('登录')")
         print("⏳ 提交登录，等待跳转...")
+
+        # 等待登录完成（URL 变为 /chat 或出现输入框）
         try:
-            await self._page.wait_for_url("**/chat*", timeout=30000)
-        except:
-            await self._page.wait_for_selector("textarea[placeholder*='提问']", timeout=30000)
-        await self._page.wait_for_load_state("networkidle")
+            await self._page.wait_for_url("**/chat*", timeout=60000)
+        except PlaywrightTimeoutError:
+            # 若 URL 未变，则等待聊天输入框
+            try:
+                await self._page.wait_for_selector("textarea[placeholder*='提问']", timeout=30000)
+            except PlaywrightTimeoutError:
+                print("❌ 登录后未进入聊天页面，请检查账号密码是否正确或是否有验证码")
+                raise
+
+        await self._page.wait_for_load_state("networkidle", timeout=15000)
         print("✅ 登录成功，进入聊天页面")
-        await self._page.wait_for_selector("textarea[placeholder*='提问']", timeout=10000)
+
+        # 等待聊天输入框完全加载
+        await self._page.wait_for_selector("textarea[placeholder*='提问']", timeout=30000)
         self._logged_in = True
 
     async def set_deep_think(self, enable: bool = False):
@@ -74,16 +96,16 @@ class DeepSeekConnector:
 
     async def new_conversation(self):
         try:
-            await self._page.click("button:has-text('新建对话')", timeout=5000)
+            await self._page.click("button:has-text('新建对话')", timeout=10000)
             await self._page.wait_for_timeout(1000)
             print("🔄 已新建对话")
         except Exception as e:
             print(f"⚠️ 新建对话失败（可能已在新建状态）: {e}")
 
-    async def ask(self, question: str, max_wait: int = 120) -> str:
+    async def ask(self, question: str, max_wait: int = 180) -> str:
         if not self._logged_in:
             raise RuntimeError("未登录，请先调用 start()")
-        input_area = await self._page.wait_for_selector("textarea[placeholder*='提问']", timeout=10000)
+        input_area = await self._page.wait_for_selector("textarea[placeholder*='提问']", timeout=30000)
         await input_area.fill(question)
         await input_area.press("Enter")
         print(f"📤 已发送问题: {question[:50]}...")
