@@ -46,8 +46,8 @@ class AutonomousBot:
             raise ValueError("请设置 DEEPSEEK_API_KEY")
         self.client = DeepSeekClient(api_key=api_key)
 
-        # 加载风格
-        self.style = self._load_file("style.txt", "你是论坛管理员，幽默风趣。")
+        # 加载风格（从文件读取，若不存在则使用默认）
+        self.style = self._load_file("style.txt", "你是论坛老坛友，幽默简洁。")
 
         # 状态持久化
         self.state_file = "state.json"
@@ -72,8 +72,8 @@ class AutonomousBot:
 
     def _load_state(self):
         default = {
-            "processed_threads": [],   # 已回复过的帖子ID
-            "processed_posts": [],     # 已回复过的评论ID
+            "processed_threads": [],
+            "processed_posts": [],
             "action_logs": [],
             "daily_stats": {},
             "last_run": None
@@ -153,21 +153,38 @@ class AutonomousBot:
         print(f"✅ 论坛登录成功，用户ID: {self.user_id}")
         return True
 
-    def get_threads_with_comments(self, category_id, limit=30):
-        """获取板块内的帖子，仅保留评论数 ≤ max_comments_to_skip 且未处理过的帖子"""
-        threads = self.poster.get_threads(self.token, category_id=category_id, page_limit=limit)
-        if not isinstance(threads, list):
-            return []
+    def get_threads_with_comments(self, category_id, limit=30, retries=2):
+        """获取板块内的帖子，仅保留评论数 ≤ max_comments_to_skip 的帖子，支持重试"""
+        for attempt in range(retries):
+            try:
+                threads = self.poster.get_threads(self.token, category_id=category_id, page_limit=limit)
+                if not isinstance(threads, list):
+                    return []
+                break
+            except Exception as e:
+                print(f"⚠️ 获取板块 {category_id} 失败 (尝试 {attempt+1}/{retries}): {e}")
+                if attempt == retries - 1:
+                    return []
+                time.sleep(5)
 
         result = []
         for t in threads:
             tid = int(t.get('id'))
-            # 跳过已处理的帖子
             if tid in self.state['processed_threads']:
                 continue
             if tid in self.blacklist_threads:
                 continue
-            all_comments = self._get_all_comments(tid)
+            # 获取评论（也带重试）
+            all_comments = []
+            for _ in range(retries):
+                try:
+                    all_comments = self._get_all_comments(tid)
+                    break
+                except Exception as e:
+                    print(f"⚠️ 获取帖子 {tid} 评论失败: {e}")
+                    if _ == retries - 1:
+                        all_comments = []
+                    time.sleep(3)
             comment_count = len(all_comments)
             if comment_count > self.max_comments_to_skip:
                 print(f"⏭️ 帖子 {tid} 评论数 {comment_count} > {self.max_comments_to_skip}，跳过")
@@ -183,12 +200,9 @@ class AutonomousBot:
         comments = []
         first_level = self.poster.get_post_comments(self.token, thread_id)
         for c in first_level:
-            # 跳过已经回复过的评论
-            if c.get('id') in self.state['processed_posts']:
-                continue
             comments.append({
                 "id": c['id'],
-                "content": c.get('content', '')[:100],  # 限制长度
+                "content": c.get('content', ''),
                 "user_nickname": c.get('user', {}).get('nickname', '未知'),
                 "reply_to_post_id": None,
                 "created_at": c.get('created_at', '')
@@ -198,15 +212,12 @@ class AutonomousBot:
         return comments
 
     def _get_replies(self, post_id):
-        """获取某条评论的所有回复，包含作者、时间，并过滤已处理的"""
         replies = []
         resp = self.poster.get_comment_replies(self.token, post_id)
         for r in resp:
-            if r.get('id') in self.state['processed_posts']:
-                continue
             replies.append({
                 "id": r['id'],
-                "content": r.get('content', '')[:100],
+                "content": r.get('content', ''),
                 "user_nickname": r.get('user', {}).get('nickname', '未知'),
                 "reply_to_post_id": r.get('reply_to_post_id'),
                 "created_at": r.get('created_at', '')
@@ -216,10 +227,9 @@ class AutonomousBot:
         return replies
 
     def decide_action(self, thread, comments):
-        """AI 决策，包含帖子完整信息和评论元数据"""
-        # 截取帖子内容前200字
+        """AI 决策，包含帖子完整信息和评论元数据，帖子内容截取200字"""
         thread_title = thread.get('title', '无标题')
-        thread_content = (thread.get('content', '') or '')[:200]
+        thread_content = (thread.get('content', '') or '')[:200]   # 截取200字
         thread_author = thread.get('user', {}).get('nickname', '未知用户')
         thread_time = thread.get('created_at', '未知时间')
 
@@ -291,8 +301,8 @@ class AutonomousBot:
             content = decision.get("content", "")
             if not content:
                 content = "支持一下！"
-            success, comment_id = self.poster.create_comment(self.token, thread_id, content)
-            if success and comment_id:
+            success, _ = self.poster.create_comment(self.token, thread_id, content)
+            if success:
                 self.reply_threads_count += 1
                 self._log_action("reply_to_thread", thread_id, content, True)
                 self.state["processed_threads"].append(thread_id)
@@ -310,8 +320,8 @@ class AutonomousBot:
             for c in comments:
                 if c['id'] == post_id and c['reply_to_post_id']:
                     reply_to = c['reply_to_post_id']
-            success, comment_id = self.poster.reply_to_comment(self.token, post_id, content, reply_to)
-            if success and comment_id:
+            success = self.poster.reply_to_comment(self.token, post_id, content, reply_to)
+            if success:
                 self.reply_comments_count += 1
                 self._log_action("reply_to_comment", post_id, content, True)
                 self.state["processed_posts"].append(post_id)
