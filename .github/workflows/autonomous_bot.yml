@@ -2,8 +2,8 @@ name: 自主论坛AI代理
 
 on:
   schedule:
-    # 每天 UTC 0:00 运行（北京时间 08:00），可根据需要调整
-    - cron: '0 0 * * *'
+    # 北京时间 6:00 (UTC 22:00), 12:00 (UTC 4:00), 21:00 (UTC 13:00)
+    - cron: '0 22,4,13 * * *'
   workflow_dispatch:  # 支持手动触发
 
 permissions:
@@ -20,11 +20,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-
-      - name: 安装系统依赖（验证码识别所需）
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgtk-3-0 libnss3 libxss1 libasound2t64 libgbm1
 
       - name: 安装 Python 依赖
         run: |
@@ -44,9 +39,6 @@ jobs:
           DAILY_POST_LIMIT: ${{ secrets.DAILY_POST_LIMIT }}
           BLACKLIST_THREAD_IDS: ${{ secrets.BLACKLIST_THREAD_IDS }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-          # 以下变量可选，用于原有风格/背景（如有）
-          # STYLE_FILE: style.txt
-          # BACKGROUND_FILE: mk48.txt
         run: |
           python autonomous_bot.py
 
