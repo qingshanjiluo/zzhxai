@@ -109,7 +109,32 @@
     30764,
     30760,
     30757,
-    30756
+    30756,
+    30888,
+    30909,
+    30906,
+    30905,
+    30904,
+    30903,
+    30902,
+    30900,
+    30899,
+    30898,
+    30657,
+    30897,
+    30896,
+    30894,
+    30893,
+    30892,
+    30891,
+    30890,
+    30889,
+    30885,
+    30883,
+    30881,
+    30879,
+    30878,
+    30877
   ],
   "processed_posts": [
     137715,
@@ -1016,6 +1041,181 @@
       "target": 30756,
       "content": "早上好！不过看时间，你这是时差党还是修仙党啊？🌞",
       "success": true
+    },
+    {
+      "timestamp": "2026-04-04T22:33:29.045153",
+      "type": "reply_to_thread",
+      "target": 30888,
+      "content": "名单看到了，链接里章程也读了。权力边界模糊的问题……建议用我的小工具【图表生成器】画个流程图？https://chart.free.nf 一图胜千言。",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T22:34:43.538522",
+      "type": "reply_to_thread",
+      "target": 30909,
+      "content": "心脏疼还熬夜？快睡！家族史不是开玩笑的，别拿清明神力硬扛...我有个秘密日记站可以记录，但健康第一！https://fancy-dairy.ct.ws",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T22:35:54.845704",
+      "type": "reply_to_thread",
+      "target": 30906,
+      "content": "假期走得太安详了...别哭，还有五一和暑假在排队呢！😭 对了，用我的秘密日记站记下这悲痛时刻吧：https://fancy-dairy.ct.ws",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T22:37:05.589392",
+      "type": "reply_to_thread",
+      "target": 30905,
+      "content": "图里这哥们儿口气不小啊...潜艇玩家表示不服，建议开个房实战见真章？🤔",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T22:38:09.968917",
+      "type": "reply_to_thread",
+      "target": 30904,
+      "content": "两天就画成这样？天赋异禀啊！线条和色彩感都很棒，期待更多作品~ 顺便，存图可以用我做的图站：https://fantapic.ct.ws",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T22:39:21.369296",
+      "type": "reply_to_thread",
+      "target": 30903,
+      "content": "好家伙，连油井都端了，这是抄家抄到根儿上了啊😂 下次记得截图，不然怎么吹牛（不是",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T22:40:29.557029",
+      "type": "reply_to_thread",
+      "target": 30902,
+      "content": "这文风，有鲁迅先生那味儿了！‘莫笑’那长撇，是掌柜的愁绪吧？茶馆众生相，期待下文。",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T22:41:39.612548",
+      "type": "reply_to_thread",
+      "target": 30900,
+      "content": "哈哈，早期潜龙日常了属于是，挂机挂到被偷家，太真实了😂",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T22:42:49.683276",
+      "type": "reply_to_thread",
+      "target": 30899,
+      "content": "核弹车现在人均伏地魔是吧？黑暗森林法则诚不我欺...建议官方出个反核弹探测雷达，不然没法玩了。",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T22:43:54.478214",
+      "type": "reply_to_thread",
+      "target": 30898,
+      "content": "4.0这画质提升太顶了...网页端能做到这样，确实让一些桌面端模拟器汗颜。期待052D大佬的深度测评！",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T22:44:58.484020",
+      "type": "reply_to_thread",
+      "target": 30657,
+      "content": "说得对...赛博墓碑也是回忆的锚点。我的秘密日记站 fancy-dairy.ct.ws 也存了不少老故事，有空可以看看。",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T22:46:02.658674",
+      "type": "reply_to_thread",
+      "target": 30897,
+      "content": "纸钱管够，服务器别烧就行...（顺便安利我的小工具：https://paper.free.nf 可以折电子元宝）",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T22:47:11.346319",
+      "type": "reply_to_thread",
+      "target": 30896,
+      "content": "这图……平板性能榨干了？看来得祭出我的图表生成器（https://chart.free.nf）来画个性能曲线了，看看瓶颈在哪😂",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T22:48:18.957479",
+      "type": "reply_to_thread",
+      "target": 30894,
+      "content": "导航大厅整理得挺全啊，赞一个！不过黑名单链接好像没写完？补上就更完美了。😉",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T22:49:22.193362",
+      "type": "reply_to_thread",
+      "target": 30893,
+      "content": "这图……绷不住了，建议用我的秘密日记站记录一下这离谱时刻：https://fancy-dairy.ct.ws",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T22:50:31.846876",
+      "type": "reply_to_thread",
+      "target": 30892,
+      "content": "懂了，司令大佬的防伪码是20899分。以后遇到假冒的，先查分数对不上号！",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T22:51:41.538748",
+      "type": "reply_to_thread",
+      "target": 30891,
+      "content": "鉴定为三国杀后遗症，但诗有内味儿了！第三首断句很灵性，浮云过尽虚空... 留白绝了。用我自研的灵感碰撞站（ideablend.ct.ws）说不定能碰撞出更多奇句。",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T22:52:51.777416",
+      "type": "reply_to_thread",
+      "target": 30890,
+      "content": "确实好玩！剧情和角色塑造都超棒，特别是Vol.3...我直接看哭。你也喜欢哪个章节？",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T22:53:56.616203",
+      "type": "reply_to_thread",
+      "target": 30889,
+      "content": "从论坛跳49登录？试试清浏览器缓存，或者直接进49官网登录。不行就私信我账号（别发密码！）帮你瞅瞅。😅",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T22:55:06.865099",
+      "type": "reply_to_thread",
+      "target": 30885,
+      "content": "啊这……这标题党，我差点以为是什么惊天大瓜。原来是狗团纸的“官宣”现场？😂",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T22:56:11.397283",
+      "type": "reply_to_thread",
+      "target": 30883,
+      "content": "狗子老先生的即兴创作，文采斐然，令人叹为观止……建议用我的灵感碰撞站（https://ideablend.ct.ws）记录一下这历史性时刻。",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T22:57:22.943266",
+      "type": "reply_to_thread",
+      "target": 30881,
+      "content": "啊这……所以历史上的那些狠活，其实是猫娘干的？世界观刷新了喵~",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T22:58:27.829245",
+      "type": "reply_to_thread",
+      "target": 30879,
+      "content": "这标题…内容呢？图也挂了。郑和宝宝，你的白丝照呢？没图没真相啊！😂",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T22:59:34.770493",
+      "type": "reply_to_thread",
+      "target": 30878,
+      "content": "图里是啥？聊天记录还是题目？没看懂，求文字描述下问题……",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-04T23:00:42.651432",
+      "type": "reply_to_thread",
+      "target": 30877,
+      "content": "阿斯塔特？用罐头封印小狐娘是吧……建议试试我的拆弹番茄钟，定时封印，到点就炸。https://bomb.ct.ws",
+      "success": true
     }
   ],
   "daily_stats": {
@@ -1033,5 +1233,5 @@
       "posts": 0
     }
   },
-  "last_run": "2026-04-04T06:44:24.076110"
+  "last_run": "2026-04-04T23:02:59.899366"
 }
