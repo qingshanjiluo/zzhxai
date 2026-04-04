@@ -1,4 +1,3 @@
-import asyncio
 import os
 import json
 import time
@@ -8,7 +7,7 @@ import traceback
 from datetime import datetime, date
 from login import BBSTurkeyBotLogin
 from post import BBSPoster
-from deepseek_connector import DeepSeekConnector
+from deepseek_client import DeepSeekClient
 
 class AutonomousBot:
     def __init__(self):
@@ -17,31 +16,46 @@ class AutonomousBot:
         self.username = os.getenv("BOT_USERNAME")
         self.password = os.getenv("BOT_PASSWORD")
         if not self.username or not self.password:
-            raise ValueError("请设置 BOT_USERNAME 和 BOT_PASSWORD 环境变量")
+            raise ValueError("请设置 BOT_USERNAME 和 BOT_PASSWORD")
 
+        # 监控板块
         target_categories_str = os.getenv("TARGET_CATEGORIES", "2,5")
         self.target_categories = [int(x) for x in target_categories_str.split(",") if x.strip()]
-        skip_latest_str = os.getenv("SKIP_LATEST", "5")
-        self.skip_latest = int(skip_latest_str) if skip_latest_str else 5
-        login_retries_str = os.getenv("LOGIN_RETRIES", "50")
-        self.login_retries = int(login_retries_str) if login_retries_str else 50
-        self.admin_mk49_token = os.getenv("ADMIN_MK49_TOKEN")
-        blacklist_str = os.getenv("BLACKLIST_USER_IDS", "")
-        self.blacklist = [int(x) for x in blacklist_str.split(",") if x.strip()]
-        self.style = self._load_file("style.txt", "你是一个论坛用户，回复风格幽默风趣。")
-        self.background = self._load_file("mk48.txt", "")
+        self.skip_latest = int(os.getenv("SKIP_LATEST", "5"))
+        self.login_retries = int(os.getenv("LOGIN_RETRIES", "50"))
+
+        # 黑名单帖子ID（不评论）
+        blacklist_str = os.getenv("BLACKLIST_THREAD_IDS", "")
+        self.blacklist_threads = [int(x) for x in blacklist_str.split(",") if x.strip()]
+
+        # 操作配额
+        self.max_reply_threads = int(os.getenv("MAX_REPLY_THREADS", "10"))
+        self.max_reply_comments = int(os.getenv("MAX_REPLY_COMMENTS", "5"))
+        self.max_create_threads = int(os.getenv("MAX_CREATE_THREADS", "1"))
+        self.daily_post_limit = int(os.getenv("DAILY_POST_LIMIT", "5"))
+
+        # 点赞概率（AI 决策，但可设置偏好）
+        self.like_preference = float(os.getenv("LIKE_PREFERENCE", "0.3"))  # AI 在决策时会更倾向于点赞的概率
+
+        # DeepSeek API 客户端
+        api_key = os.getenv("DEEPSEEK_API_KEY")
+        if not api_key:
+            raise ValueError("请设置 DEEPSEEK_API_KEY")
+        self.client = DeepSeekClient(api_key=api_key)
+
+        # 加载风格（可选，用于提示词）
+        self.style = self._load_file("style.txt", "你是论坛管理员，幽默风趣。")
+
+        # 状态持久化
         self.state_file = "state.json"
         self.state = self._load_state()
-        max_reply_threads_str = os.getenv("MAX_REPLY_THREADS", "15")
-        self.max_reply_threads = int(max_reply_threads_str) if max_reply_threads_str else 15
-        max_create_threads_str = os.getenv("MAX_CREATE_THREADS", "1")
-        self.max_create_threads = int(max_create_threads_str) if max_create_threads_str else 1
-        daily_limit_str = os.getenv("DAILY_POST_LIMIT", "10")
-        self.daily_post_limit = int(daily_limit_str) if daily_limit_str else 10
+
+        # 运行计数
         self.reply_threads_count = 0
+        self.reply_comments_count = 0
         self.create_threads_count = 0
         self.today_posts_count = 0
-        self.ds = None
+
         self.token = None
         self.user_id = None
         self.session = None
@@ -56,6 +70,7 @@ class AutonomousBot:
     def _load_state(self):
         default = {
             "processed_threads": [],
+            "processed_posts": [],      # 已处理的评论ID
             "action_logs": [],
             "daily_stats": {},
             "last_run": None
@@ -68,6 +83,8 @@ class AutonomousBot:
                     state[key] = value
             if "processed_threads" in state:
                 state["processed_threads"] = [int(x) for x in state["processed_threads"]]
+            if "processed_posts" in state:
+                state["processed_posts"] = [int(x) for x in state["processed_posts"]]
             return state
         return default
 
@@ -131,230 +148,219 @@ class AutonomousBot:
         except:
             print("⚠️ 页面刷新失败，但继续运行")
         print(f"✅ 论坛登录成功，用户ID: {self.user_id}")
-        if self.admin_mk49_token:
-            print("🔑 管理员删帖功能已启用")
         return True
 
-    async def init_deepseek(self):
-        headless = os.getenv("DS_HEADLESS", "True").lower() == "true"
-        self.ds = DeepSeekConnector(
-            username=os.getenv("DEEPSEEK_USERNAME"),
-            password=os.getenv("DEEPSEEK_PASSWORD"),
-            headless=headless
-        )
-        await self.ds.start()
-        deep_think = os.getenv("DS_DEEP_THINK", "False").lower() == "true"
-        web_search = os.getenv("DS_WEB_SEARCH", "False").lower() == "true"
-        await self.ds.set_deep_think(deep_think)
-        await self.ds.set_web_search(web_search)
-        await self.ds.new_conversation()
-        print("✅ DeepSeek 网页版连接器已就绪")
+    def get_threads_with_comments(self, category_id, limit=30):
+        """获取板块内的帖子，并附加评论列表（仅限评论数 ≤ 10 的帖子）"""
+        threads = self.poster.get_threads(self.token, category_id=category_id, page_limit=limit)
+        if not isinstance(threads, list):
+            return []
 
-    def get_new_threads(self):
-        new_threads = []
-        for cat_id in self.target_categories:
-            threads = self.poster.get_threads(self.token, category_id=cat_id, page_limit=30)
-            if not isinstance(threads, list):
+        result = []
+        for t in threads:
+            tid = int(t.get('id'))
+            # 跳过已处理、黑名单、置顶帖（可选）
+            if tid in self.state['processed_threads']:
                 continue
-            threads_to_process = threads[self.skip_latest:]
-            for t in threads_to_process:
-                tid = int(t.get('id'))
-                author_id = int(t.get('user_id', 0))
-                if tid in self.state['processed_threads']:
-                    continue
-                if author_id in self.blacklist:
-                    print(f"  跳过黑名单用户 {author_id} 的帖子: {t['title'][:30]}")
-                    continue
-                new_threads.append(t)
-        return new_threads
+            if tid in self.blacklist_threads:
+                continue
+            # 获取所有评论（包括嵌套）
+            all_comments = self._get_all_comments(tid)
+            if len(all_comments) > 10:
+                print(f"⏭️ 帖子 {tid} 评论数 {len(all_comments)} > 10，跳过")
+                continue
+            result.append({
+                "thread": t,
+                "comments": all_comments
+            })
+        return result
 
-    async def decide_action(self, context, is_thread=True):
-        if is_thread:
-            action_prompt = f"""
-你是一个论坛用户，你需要根据当前帖子决定做什么。
+    def _get_all_comments(self, thread_id):
+        """递归获取帖子下所有评论（扁平列表，每条包含 id, content, user_nickname, reply_to_post_id）"""
+        comments = []
+        # 一级评论
+        first_level = self.poster.get_post_comments(self.token, thread_id)
+        for c in first_level:
+            comments.append({
+                "id": c['id'],
+                "content": c.get('content', ''),
+                "user_nickname": c.get('user', {}).get('nickname', '未知'),
+                "reply_to_post_id": None
+            })
+            # 递归获取回复
+            replies = self._get_replies(c['id'])
+            comments.extend(replies)
+        return comments
 
-【你的角色风格】
-{self.style}
+    def _get_replies(self, post_id):
+        """获取某条评论的所有回复（嵌套）"""
+        replies = []
+        resp = self.poster.get_comment_replies(self.token, post_id)
+        for r in resp:
+            replies.append({
+                "id": r['id'],
+                "content": r.get('content', ''),
+                "user_nickname": r.get('user', {}).get('nickname', '未知'),
+                "reply_to_post_id": r.get('reply_to_post_id')
+            })
+            # 如果还有更深层的回复，继续递归（限制深度，这里假设最多2层）
+            deeper = self._get_replies(r['id'])
+            replies.extend(deeper)
+        return replies
 
-【背景知识】
-{self.background}
-
-【帖子详情】
-{context}
-
-【操作配额】（已执行次数/总限额）
-- 回复帖子：{self.reply_threads_count}/{self.max_reply_threads}
-- 发布新帖：{self.create_threads_count}/{self.max_create_threads}
-
-【你可以执行的操作】
-- reply_to_thread: 回复帖子（需要 thread_id 和回复内容）
-- like_thread: 给帖子点赞（thread_id）
-- create_thread: 发布新帖子（需要 title, content, category_id）
-- set_essence: 给帖子加精（thread_id，需管理员权限）
-- delete_thread: 删除帖子（thread_id，需管理员权限，仅在必要时使用）
-- ignore: 不采取任何行动
-
-【注意】你只能回复帖子本身，不能回复评论。如果配额已满，则只能 ignore。
-
-【输出格式】
-只输出一个 JSON 对象。
-"""
+    def decide_action(self, thread, comments):
+        """AI 决策：是否回复帖子、回复某条评论、点赞、发新帖"""
+        # 构建简洁的上下文
+        context = f"帖子标题：{thread['title']}\n帖子内容：{thread.get('content', '')}\n"
+        if comments:
+            context += "\n现有评论（按时间顺序）：\n"
+            for idx, c in enumerate(comments[:10]):  # 最多展示10条评论
+                context += f"评论{idx+1} (ID:{c['id']}, 作者:{c['user_nickname']}): {c['content'][:100]}\n"
+                if c['reply_to_post_id']:
+                    context += f"  ↳ 回复评论ID: {c['reply_to_post_id']}\n"
         else:
-            action_prompt = f"""
-你是一个论坛用户，你需要根据当前情况决定做什么。
+            context += "暂无评论。\n"
 
-【你的角色风格】
+        prompt = f"""
 {self.style}
 
-【背景知识】
-{self.background}
+请根据以上帖子内容和评论，决定你要做什么。你可以：
+- 回复帖子（作为新评论）
+- 回复某条评论（需要提供评论ID和回复内容）
+- 给帖子点赞
+- 发布一个新帖子（需要标题和内容）
+- 什么都不做
 
-【当前情况】
-{context}
+注意：你的回复应简短幽默（不超过50字）。如果选择回复评论，请指明评论ID。
 
-【操作配额】（已执行次数/总限额）
-- 发布新帖：{self.create_threads_count}/{self.max_create_threads}
-
-【你可以执行的操作】
-- create_thread: 发布新帖子（需要 title, content, category_id）
-- ignore: 不采取任何行动
-
-【输出格式】
-只输出一个 JSON 对象。
+输出格式（只输出JSON，不要其他文字）：
+{{"action": "reply_to_thread", "content": "回复内容"}}
+{{"action": "reply_to_comment", "post_id": 12345, "content": "回复内容"}}
+{{"action": "like_thread"}}
+{{"action": "create_thread", "title": "标题", "content": "内容"}}
+{{"action": "ignore"}}
 """
-        response = await self.ds.ask(action_prompt, max_wait=180)
+        response = self.client.generate(prompt, max_tokens=150, temperature=0.8)
         try:
             json_match = re.search(r'\{.*\}', response, re.DOTALL)
             if json_match:
                 return json.loads(json_match.group())
             else:
-                print("AI 返回非 JSON，使用默认忽略")
-                return {"action": "ignore", "reason": "解析失败"}
-        except Exception as e:
-            print(f"解析 AI 决策失败: {e}")
-            return {"action": "ignore", "reason": "解析异常"}
+                return {"action": "ignore"}
+        except:
+            return {"action": "ignore"}
 
-    def execute_action(self, decision):
+    def execute_action(self, thread_id, decision, comments):
         action = decision.get("action")
         if action == "ignore":
-            print(f"⏭️ 忽略: {decision.get('reason', '无理由')}")
-            return True
+            return False
+
+        # 配额检查
         if action == "reply_to_thread" and self.reply_threads_count >= self.max_reply_threads:
-            print("⚠️ 回复帖子配额已满，跳过")
+            print("⚠️ 回复帖子配额已满")
+            return False
+        if action == "reply_to_comment" and self.reply_comments_count >= self.max_reply_comments:
+            print("⚠️ 回复评论配额已满")
             return False
         if action == "create_thread" and self.create_threads_count >= self.max_create_threads:
-            print("⚠️ 发布新帖配额已满，跳过")
+            print("⚠️ 发帖配额已满")
+            return False
+        if action == "create_thread" and self.today_posts_count >= self.daily_post_limit:
+            print("⚠️ 今日发帖上限已到")
             return False
 
         if action == "reply_to_thread":
-            thread_id = decision.get("thread_id")
-            content = decision.get("content")
-            if not thread_id or not content:
+            content = decision.get("content", "")
+            if not content:
                 return False
             success = self.poster.create_comment(self.token, thread_id, content)
             if success:
-                self.state["processed_threads"].append(thread_id)
                 self.reply_threads_count += 1
                 self._log_action("reply_to_thread", thread_id, content, True)
+                self.state["processed_threads"].append(thread_id)
                 self._save_state()
             else:
                 self._log_action("reply_to_thread", thread_id, content, False)
             return success
 
-        elif action == "like_thread":
-            thread_id = decision.get("thread_id")
-            if not thread_id:
+        elif action == "reply_to_comment":
+            post_id = decision.get("post_id")
+            content = decision.get("content")
+            if not post_id or not content:
                 return False
+            # 查找该评论是否存在，以及是否需要传入 reply_to_post_id（如果是嵌套回复）
+            reply_to = None
+            for c in comments:
+                if c['id'] == post_id and c['reply_to_post_id']:
+                    reply_to = c['reply_to_post_id']
+            success = self.poster.reply_to_comment(self.token, post_id, content, reply_to)
+            if success:
+                self.reply_comments_count += 1
+                self._log_action("reply_to_comment", post_id, content, True)
+                # 标记该评论已处理（避免重复回复）
+                self.state["processed_posts"].append(post_id)
+                self._save_state()
+            else:
+                self._log_action("reply_to_comment", post_id, content, False)
+            return success
+
+        elif action == "like_thread":
             success = self.poster.set_thread_like(self.token, thread_id, like=True)
             self._log_action("like_thread", thread_id, "", success)
             return success
 
         elif action == "create_thread":
-            title = decision.get("title")
-            content = decision.get("content")
-            category_id = decision.get("category_id", 2)
+            title = decision.get("title", "")
+            content = decision.get("content", "")
             if not title or not content:
                 return False
-            if self.today_posts_count >= self.daily_post_limit:
-                print(f"⚠️ 今日已达发帖上限 {self.daily_post_limit}，跳过创建新帖子")
-                return False
-            success, _ = self.poster.create_thread(self.token, category_id, title, content)
+            success, _ = self.poster.create_thread(self.token, 2, title, content)  # 默认板块2
             if success:
                 self.create_threads_count += 1
                 self._increment_daily_count()
-                self._log_action("create_thread", f"cat{category_id}", title, True)
+                self._log_action("create_thread", "cat2", title, True)
                 self._save_state()
             else:
-                self._log_action("create_thread", f"cat{category_id}", title, False)
+                self._log_action("create_thread", "cat2", title, False)
             return success
 
-        elif action == "set_essence":
-            thread_id = decision.get("thread_id")
-            if not thread_id:
-                return False
-            success = self.poster.set_essence(self.token, thread_id, is_essence=True)
-            self._log_action("set_essence", thread_id, "", success)
-            return success
+        return False
 
-        elif action == "delete_thread":
-            if not self.admin_mk49_token:
-                print("❌ 管理员删帖需要 ADMIN_MK49_TOKEN 环境变量")
-                return False
-            thread_id = decision.get("thread_id")
-            if not thread_id:
-                return False
-            success = self.poster.delete_thread_admin(thread_id, self.admin_mk49_token)
-            self._log_action("delete_thread", thread_id, "", success)
-            return success
-
-        else:
-            print(f"未知操作: {action}")
-            return False
-
-    async def run_once(self):
+    def run_once(self):
         start_time = time.time()
         try:
             if not self.login():
                 return
-            await self.init_deepseek()
             self._update_daily_stats()
-            new_threads = self.get_new_threads()
-            print(f"📊 发现 {len(new_threads)} 个新帖子")
-            for thread in new_threads:
-                if self.reply_threads_count >= self.max_reply_threads:
-                    break
-                print(f"📄 分析帖子: {thread['title']} (ID: {thread['id']})")
-                context = f"""
-标题：{thread['title']}
-内容：{thread.get('content', '')}
-发布者：{thread.get('user', {}).get('nickname', '未知')}
-帖子ID：{thread['id']}
-"""
-                decision = await self.decide_action(context, is_thread=True)
-                if decision.get("action") != "ignore":
-                    self.execute_action(decision)
-                delay = random.uniform(30, 120)
-                print(f"⏳ 等待 {delay:.1f} 秒后继续...")
-                time.sleep(delay)
 
-            if self.create_threads_count < self.max_create_threads and self.today_posts_count < self.daily_post_limit:
-                context = "现在你可以决定是否发布一个新帖子。如果没有合适的主题，可以选择 ignore。"
-                decision = await self.decide_action(context, is_thread=False)
-                if decision.get("action") == "create_thread":
-                    self.execute_action(decision)
+            for cat_id in self.target_categories:
+                if (self.reply_threads_count >= self.max_reply_threads and
+                    self.reply_comments_count >= self.max_reply_comments and
+                    self.create_threads_count >= self.max_create_threads):
+                    break
+                print(f"📂 扫描板块 {cat_id}")
+                items = self.get_threads_with_comments(cat_id, limit=20)
+                for item in items:
+                    thread = item['thread']
+                    comments = item['comments']
+                    tid = thread['id']
+                    print(f"📄 帖子: {thread['title']} (ID:{tid}) 评论数:{len(comments)}")
+                    decision = self.decide_action(thread, comments)
+                    if decision.get("action") != "ignore":
+                        self.execute_action(tid, decision, comments)
+                    time.sleep(random.uniform(2, 5))
 
             elapsed = time.time() - start_time
-            print(f"✅ 本轮运行完成，耗时 {elapsed/60:.1f} 分钟")
+            print(f"✅ 运行完成，耗时 {elapsed/60:.1f} 分钟")
             print(f"📊 统计: 回复帖子 {self.reply_threads_count}/{self.max_reply_threads}, "
-                  f"发布新帖 {self.create_threads_count}/{self.max_create_threads}")
+                  f"回复评论 {self.reply_comments_count}/{self.max_reply_comments}, "
+                  f"发新帖 {self.create_threads_count}/{self.max_create_threads}")
         except Exception as e:
-            print(f"❌ 运行过程中发生错误: {e}")
+            print(f"❌ 运行错误: {e}")
             traceback.print_exc()
         finally:
-            if self.ds:
-                await self.ds.close()
             self._save_state()
 
 if __name__ == "__main__":
     bot = AutonomousBot()
-    asyncio.run(bot.run_once())
+    bot.run_once()
