@@ -11,37 +11,49 @@ from deepseek_client import DeepSeekClient
 
 class AutonomousBot:
     def __init__(self):
+        # 论坛配置
         self.base_url = os.getenv("BASE_URL", "https://mbbs.zdjl.site/mk48by049.mbbs.cc")
         self.username = os.getenv("BOT_USERNAME")
         self.password = os.getenv("BOT_PASSWORD")
         if not self.username or not self.password:
             raise ValueError("请设置 BOT_USERNAME 和 BOT_PASSWORD")
 
+        # 监听板块
         target_categories_str = os.getenv("TARGET_CATEGORIES", "2,5")
         self.target_categories = [int(x) for x in target_categories_str.split(",") if x.strip()]
         self.skip_latest = int(os.getenv("SKIP_LATEST", "1"))
         self.login_retries = int(os.getenv("LOGIN_RETRIES", "50"))
 
+        # 黑名单帖子ID（不回复）
         blacklist_str = os.getenv("BLACKLIST_THREAD_IDS", "")
         self.blacklist_threads = [int(x) for x in blacklist_str.split(",") if x.strip()]
 
+        # 操作配额
         self.max_reply_threads = int(os.getenv("MAX_REPLY_THREADS", "15"))
         self.max_reply_comments = int(os.getenv("MAX_REPLY_COMMENTS", "10"))
         self.max_create_threads = int(os.getenv("MAX_CREATE_THREADS", "2"))
         self.daily_post_limit = int(os.getenv("DAILY_POST_LIMIT", "10"))
+
+        # 评论数阈值（超过10跳过，等于或小于10则保留供AI决策）
         self.max_comments_to_skip = int(os.getenv("MAX_COMMENTS_TO_SKIP", "10"))
+
+        # 总运行时长目标（秒）
         self.target_duration = int(os.getenv("TARGET_DURATION_SECONDS", "1800"))
 
+        # DeepSeek API 客户端
         api_key = os.getenv("DEEPSEEK_API_KEY")
         if not api_key:
             raise ValueError("请设置 DEEPSEEK_API_KEY")
         self.client = DeepSeekClient(api_key=api_key)
 
+        # 加载风格
         self.style = self._load_file("style.txt", "你是论坛老坛友，幽默简洁。")
 
+        # 状态持久化
         self.state_file = "state.json"
         self.state = self._load_state()
 
+        # 运行计数
         self.reply_threads_count = 0
         self.reply_comments_count = 0
         self.create_threads_count = 0
@@ -161,14 +173,7 @@ class AutonomousBot:
                 continue
             if tid in self.blacklist_threads:
                 continue
-
-            # 获取帖子详情，确保有内容字段
-            detail = self.poster.get_thread_detail(self.token, tid)
-            if detail:
-                t['content'] = detail.get('content', '')
-            else:
-                t['content'] = t.get('content', '')
-
+            # 获取评论
             all_comments = []
             for _ in range(retries):
                 try:
@@ -180,6 +185,7 @@ class AutonomousBot:
                         all_comments = []
                     time.sleep(3)
             comment_count = len(all_comments)
+            # 评论数大于 max_comments_to_skip 的帖子直接跳过
             if comment_count > self.max_comments_to_skip:
                 print(f"⏭️ 帖子 {tid} 评论数 {comment_count} > {self.max_comments_to_skip}，跳过")
                 continue
@@ -243,24 +249,21 @@ class AutonomousBot:
         prompt = f"""
 {self.style}
 
-**当前帖子内容：**
-{context}
+请根据以上帖子内容和评论，决定你要做什么。
 
-**重要规则：**
-1. 你的回复**必须直接针对帖子标题和内容**，不能使用“新人报到”、“欢迎”等无关模板。
-2. 如果帖子是在抱怨、求助、讨论某个话题，你就围绕那个话题回复。
-3. 回复要简短（不超过60字），幽默自然，不要套话。
-4. 你可以选择：
-   - 回复帖子（最常用）
-   - 回复某条评论（如果某条评论值得回应）
-   - 给帖子点赞
-   - 发布一个新帖子（如果灵感突发）
+你可以：
+- 回复帖子（作为新评论）
+- 回复某条评论（提供评论ID）
+- 发布一个新帖子（标题和内容）
+- 什么都不做（ignore）
 
-**输出格式（只输出JSON）：**
+注意：你的回复应简短幽默（不超过60字）。**这个帖子评论数不超过10条，你可以选择回应，也可以忽略**。请根据实际情况判断是否有必要参与讨论。
+
+输出格式（只输出JSON）：
 {{"action": "reply_to_thread", "content": "回复内容"}}
 {{"action": "reply_to_comment", "post_id": 12345, "content": "回复内容"}}
-{{"action": "like_thread"}}
 {{"action": "create_thread", "title": "标题", "content": "内容"}}
+{{"action": "ignore", "reason": "理由"}}
 """
         response = self.client.generate(prompt, max_tokens=150, temperature=0.9)
         try:
@@ -268,16 +271,17 @@ class AutonomousBot:
             if json_match:
                 return json.loads(json_match.group())
             else:
-                return {"action": "reply_to_thread", "content": "有意思，支持一下！"}
+                return {"action": "ignore", "reason": "解析失败"}
         except:
-            return {"action": "reply_to_thread", "content": "有意思，支持一下！"}
+            return {"action": "ignore", "reason": "解析异常"}
 
     def execute_action(self, thread_id, decision, comments):
         action = decision.get("action")
         if action == "ignore":
-            action = "reply_to_thread"
-            decision["content"] = decision.get("content", "有点意思，支持一下！")
+            print(f"⏭️ 忽略: {decision.get('reason', '无理由')}")
+            return True
 
+        # 配额检查
         if action == "reply_to_thread" and self.reply_threads_count >= self.max_reply_threads:
             print("⚠️ 回复帖子配额已满")
             return False
@@ -322,11 +326,6 @@ class AutonomousBot:
                 self._save_state()
             else:
                 self._log_action("reply_to_comment", post_id, content, False)
-            return success
-
-        elif action == "like_thread":
-            success = self.poster.set_thread_like(self.token, thread_id, like=True)
-            self._log_action("like_thread", thread_id, "", success)
             return success
 
         elif action == "create_thread":
