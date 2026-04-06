@@ -25,10 +25,11 @@ class AutonomousBot:
         blacklist_str = os.getenv("BLACKLIST_THREAD_IDS", "")
         self.blacklist_threads = [int(x) for x in blacklist_str.split(",") if x.strip()]
 
+        # 只评论帖子，不评论回复、不点赞、不发新帖
         self.max_reply_threads = int(os.getenv("MAX_REPLY_THREADS", "15"))
-        self.max_reply_comments = int(os.getenv("MAX_REPLY_COMMENTS", "10"))
-        self.max_create_threads = int(os.getenv("MAX_CREATE_THREADS", "2"))
-        self.daily_post_limit = int(os.getenv("DAILY_POST_LIMIT", "10"))
+        self.max_reply_comments = 0
+        self.max_create_threads = 0
+        self.daily_post_limit = int(os.getenv("DAILY_POST_LIMIT", "0"))  # 不发新帖，上限0
         self.max_comments_to_skip = int(os.getenv("MAX_COMMENTS_TO_SKIP", "10"))
         self.target_duration = int(os.getenv("TARGET_DURATION_SECONDS", "1800"))
 
@@ -104,6 +105,7 @@ class AutonomousBot:
         self.today_posts_count = self.state["daily_stats"][today]["posts"]
 
     def _increment_daily_count(self):
+        # 不发帖，此方法不会使用，保留以防万一
         today = date.today().isoformat()
         if today not in self.state["daily_stats"]:
             self.state["daily_stats"][today] = {"posts": 0}
@@ -220,6 +222,7 @@ class AutonomousBot:
         return replies
 
     def decide_action(self, thread, comments):
+        """只允许回复帖子（reply_to_thread）或忽略"""
         thread_title = thread.get('title', '无标题')
         thread_content = (thread.get('content', '') or '')[:200]
         thread_author = thread.get('user', {}).get('nickname', '未知用户')
@@ -248,19 +251,12 @@ class AutonomousBot:
 
 **重要规则：**
 1. 你的回复**必须直接针对帖子标题和内容**，不能使用“新人报到”、“欢迎”等无关模板。
-2. 如果帖子是在抱怨、求助、讨论某个话题，你就围绕那个话题回复。
-3. 回复要简短（不超过60字），幽默自然，不要套话。
-4. 你可以选择：
-   - 回复帖子（最常用）
-   - 回复某条评论（如果某条评论值得回应）
-   - 给帖子点赞
-   - 发布一个新帖子（如果灵感突发）
+2. 回复要简短（不超过60字），幽默自然，不要套话。
+3. 你只能选择回复帖子（作为新评论）或者忽略。
 
 **输出格式（只输出JSON）：**
 {{"action": "reply_to_thread", "content": "回复内容"}}
-{{"action": "reply_to_comment", "post_id": 12345, "content": "回复内容"}}
-{{"action": "like_thread"}}
-{{"action": "create_thread", "title": "标题", "content": "内容"}}
+{{"action": "ignore"}}
 """
         response = self.client.generate(prompt, max_tokens=150, temperature=0.9)
         try:
@@ -275,76 +271,30 @@ class AutonomousBot:
     def execute_action(self, thread_id, decision, comments):
         action = decision.get("action")
         if action == "ignore":
-            action = "reply_to_thread"
-            decision["content"] = decision.get("content", "有点意思，支持一下！")
+            print("   AI 决定忽略")
+            return False
 
-        if action == "reply_to_thread" and self.reply_threads_count >= self.max_reply_threads:
+        # 只处理 reply_to_thread，忽略其他任何操作
+        if action != "reply_to_thread":
+            print(f"   ⚠️ 不支持操作 {action}，已忽略")
+            return False
+
+        if self.reply_threads_count >= self.max_reply_threads:
             print("⚠️ 回复帖子配额已满")
             return False
-        if action == "reply_to_comment" and self.reply_comments_count >= self.max_reply_comments:
-            print("⚠️ 回复评论配额已满")
-            return False
-        if action == "create_thread" and self.create_threads_count >= self.max_create_threads:
-            print("⚠️ 发帖配额已满")
-            return False
-        if action == "create_thread" and self.today_posts_count >= self.daily_post_limit:
-            print("⚠️ 今日发帖上限已到")
-            return False
 
-        if action == "reply_to_thread":
-            content = decision.get("content", "")
-            if not content:
-                content = "支持一下！"
-            success, _ = self.poster.create_comment(self.token, thread_id, content)
-            if success:
-                self.reply_threads_count += 1
-                self._log_action("reply_to_thread", thread_id, content, True)
-                self.state["processed_threads"].append(thread_id)
-                self._save_state()
-            else:
-                self._log_action("reply_to_thread", thread_id, content, False)
-            return success
-
-        elif action == "reply_to_comment":
-            post_id = decision.get("post_id")
-            content = decision.get("content", "")
-            if not post_id or not content:
-                return False
-            reply_to = None
-            for c in comments:
-                if c['id'] == post_id and c['reply_to_post_id']:
-                    reply_to = c['reply_to_post_id']
-            success = self.poster.reply_to_comment(self.token, post_id, content, reply_to)
-            if success:
-                self.reply_comments_count += 1
-                self._log_action("reply_to_comment", post_id, content, True)
-                self.state["processed_posts"].append(post_id)
-                self._save_state()
-            else:
-                self._log_action("reply_to_comment", post_id, content, False)
-            return success
-
-        elif action == "like_thread":
-            success = self.poster.set_thread_like(self.token, thread_id, like=True)
-            self._log_action("like_thread", thread_id, "", success)
-            return success
-
-        elif action == "create_thread":
-            title = decision.get("title", "")
-            content = decision.get("content", "")
-            if not title or not content:
-                return False
-            success, _ = self.poster.create_thread(self.token, 2, title, content)
-            if success:
-                self.create_threads_count += 1
-                self._increment_daily_count()
-                self._log_action("create_thread", "cat2", title, True)
-                self._save_state()
-            else:
-                self._log_action("create_thread", "cat2", title, False)
-            return success
-
-        return False
+        content = decision.get("content", "")
+        if not content:
+            content = "支持一下！"
+        success, _ = self.poster.create_comment(self.token, thread_id, content)
+        if success:
+            self.reply_threads_count += 1
+            self._log_action("reply_to_thread", thread_id, content, True)
+            self.state["processed_threads"].append(thread_id)
+            self._save_state()
+        else:
+            self._log_action("reply_to_thread", thread_id, content, False)
+        return success
 
     def run_once(self):
         start_time = time.time()
@@ -358,9 +308,7 @@ class AutonomousBot:
                 print(f"📂 扫描板块 {cat_id}")
                 items = self.get_threads_with_comments(cat_id, limit=30)
                 all_items.extend(items)
-                if (self.reply_threads_count >= self.max_reply_threads and
-                    self.reply_comments_count >= self.max_reply_comments and
-                    self.create_threads_count >= self.max_create_threads):
+                if self.reply_threads_count >= self.max_reply_threads:
                     break
 
             total_items = len(all_items)
@@ -375,10 +323,8 @@ class AutonomousBot:
             print(f"📊 共 {total_items} 个待处理帖子，计划每个间隔约 {interval_per_item:.1f} 秒")
 
             for idx, item in enumerate(all_items):
-                if (self.reply_threads_count >= self.max_reply_threads and
-                    self.reply_comments_count >= self.max_reply_comments and
-                    self.create_threads_count >= self.max_create_threads):
-                    print("✅ 所有配额已用完，提前结束")
+                if self.reply_threads_count >= self.max_reply_threads:
+                    print("✅ 回复帖子配额已用完，提前结束")
                     break
 
                 thread = item['thread']
@@ -396,9 +342,7 @@ class AutonomousBot:
 
             elapsed = time.time() - start_time
             print(f"✅ 运行完成，耗时 {elapsed/60:.1f} 分钟")
-            print(f"📊 统计: 回复帖子 {self.reply_threads_count}/{self.max_reply_threads}, "
-                  f"回复评论 {self.reply_comments_count}/{self.max_reply_comments}, "
-                  f"发新帖 {self.create_threads_count}/{self.max_create_threads}")
+            print(f"📊 统计: 回复帖子 {self.reply_threads_count}/{self.max_reply_threads}")
         except Exception as e:
             print(f"❌ 运行错误: {e}")
             traceback.print_exc()
