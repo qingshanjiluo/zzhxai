@@ -4,48 +4,94 @@ on:
   schedule:
     # 北京时间 6:00 (UTC 22:00), 12:00 (UTC 4:00), 21:00 (UTC 13:00)
     - cron: '0 22,4,13 * * *'
-  workflow_dispatch:  # 支持手动触发
+  workflow_dispatch:        # 手动触发
+  push:
+    branches: [ main ]       # 可选：推送时也运行（用于测试）
 
 permissions:
   contents: write
 
+env:
+  PYTHON_VERSION: '3.10'
+  TZ: Asia/Shanghai         # 设置时区，便于日志查看
+
 jobs:
   run-bot:
     runs-on: ubuntu-latest
+    timeout-minutes: 45      # 超时45分钟（机器人运行30分钟，留缓冲）
+
     steps:
+      # 1. 检出代码（带完整历史，用于提交）
       - name: 检出代码
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0      # 获取完整历史，避免提交冲突
 
+      # 2. 设置 Python 环境（带缓存）
       - name: 设置 Python 环境
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'        # 缓存 pip 依赖，加速安装
 
+      # 3. 安装系统依赖（仅验证码识别需要）
+      - name: 安装系统依赖
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-0 libnss3 libxss1 libasound2t64 libgbm1
+
+      # 4. 安装 Python 依赖（带重试）
       - name: 安装 Python 依赖
         run: |
+          pip install --upgrade pip
           pip install -r requirements.txt
+        continue-on-error: false
 
+      # 5. 运行机器人（带重试和详细日志）
       - name: 运行自主代理
-        env:
-          BOT_USERNAME: ${{ secrets.BOT_USERNAME }}
-          BOT_PASSWORD: ${{ secrets.BOT_PASSWORD }}
-          BASE_URL: ${{ secrets.BASE_URL }}
-          TARGET_CATEGORIES: ${{ secrets.TARGET_CATEGORIES }}
-          SKIP_LATEST: ${{ secrets.SKIP_LATEST }}
-          LOGIN_RETRIES: ${{ secrets.LOGIN_RETRIES }}
-          MAX_REPLY_THREADS: ${{ secrets.MAX_REPLY_THREADS }}
-          MAX_REPLY_COMMENTS: ${{ secrets.MAX_REPLY_COMMENTS }}
-          MAX_CREATE_THREADS: ${{ secrets.MAX_CREATE_THREADS }}
-          DAILY_POST_LIMIT: ${{ secrets.DAILY_POST_LIMIT }}
-          BLACKLIST_THREAD_IDS: ${{ secrets.BLACKLIST_THREAD_IDS }}
-          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-        run: |
-          python autonomous_bot.py
+        id: run_bot
+        uses: nick-fields/retry@v3   # 使用重试 action，最多重试2次
+        with:
+          timeout_minutes: 40
+          max_attempts: 2
+          retry_wait_seconds: 30
+          command: |
+            echo "开始运行时间: $(date '+%Y-%m-%d %H:%M:%S %Z')"
+            python autonomous_bot.py 2>&1 | tee bot_output.log
+          on_retry_command: |
+            echo "运行失败，将在30秒后重试..."
 
+      # 6. 保存运行日志（用于调试）
+      - name: 保存运行日志
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bot-logs
+          path: bot_output.log
+          retention-days: 7
+
+      # 7. 提交状态文件（处理冲突）
       - name: 提交状态文件
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull origin main --rebase || true   # 先拉取最新，避免冲突
           git add state.json
-          git diff --quiet && git diff --staged --quiet || git commit -m "更新 AI 代理状态日志"
-          git push
+          if git diff --staged --quiet; then
+            echo "无状态变化，跳过提交"
+          else
+            git commit -m "更新 AI 代理状态日志 (运行于 $(date '+%Y-%m-%d %H:%M:%S'))"
+            git push origin main
+          fi
+
+      # 8. 可选：发送运行摘要到钉钉/飞书/Telegram（需要配置 secrets）
+      # - name: 发送运行报告
+      #   if: always()
+      #   run: |
+      #     # 示例：发送到钉钉机器人
+      #     curl -X POST -H "Content-Type: application/json" -d '{
+      #       "msgtype": "text",
+      #       "text": {"content": "论坛机器人运行完成\n状态: ${{ steps.run_bot.outcome }}"}
+      #     }' ${{ secrets.DINGTALK_WEBHOOK }}
+      #   continue-on-error: true
