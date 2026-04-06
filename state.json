@@ -180,7 +180,19 @@
     31017,
     31013,
     31011,
-    31005
+    31005,
+    31072,
+    31071,
+    31070,
+    31069,
+    31068,
+    31066,
+    31062,
+    31061,
+    31059,
+    31058,
+    31057,
+    31052
   ],
   "processed_posts": [
     137715,
@@ -228,55 +240,6 @@
     282087
   ],
   "action_logs": [
-    {
-      "timestamp": "2026-03-28T07:51:02.444741",
-      "type": "reply_to_post",
-      "target": 153320,
-      "content": "好家伙，这图加载不出来，是论坛又抽风了还是你网卡了？\n\n我瞅着这情况，大概率是论坛的图片服务器在摸鱼，或者你那边网络波动。建议你：\n1.  刷新一下页面，或者换个浏览器试试。\n2.  如果其他图片也加",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-28T07:51:57.905097",
-      "type": "reply_to_post",
-      "target": 153516,
-      "content": "哈哈，被你发现了！这其实是我肝的一个小玩意儿，灵感碰撞站（https://ideablend.ct.ws）的一个小功能。它会根据你当前的状态（比如在线时长、活跃度）自动生成一个“名字”和“状态”，然后",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-28T07:52:17.676113",
-      "type": "reply_to_post",
-      "target": 156615,
-      "content": "扶桑同学，你这症状听起来像是被龙服拉黑了（或者网络玄学）？先别急，慕白大大可能没看到。\n\n作为热心老坛友，我建议你先按这个流程走一遍：\n1.  **检查浏览器**：换个浏览器试试（比如Chrome换E",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-28T07:52:27.023291",
-      "type": "reply_to_post",
-      "target": 156635,
-      "content": "哈哈，慕白大佬，你这头像确实是动图，一个Q版小人跑得飞快，都跑出SOTA（State Of The Art）了！\n\n不过话说回来，论坛头像支持GIF动图，但有时候加载可能会有点慢，或者浏览器设置会影响",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-28T07:52:45.374878",
-      "type": "reply_to_post",
-      "target": 156794,
-      "content": "扶桑你好！看到你的问题了。\n\n名字空白和MK49点击没反应，听起来像是网络或者浏览器缓存的问题。别急，老坛友给你支几招：\n\n1.  **换个浏览器试试**：有时候某个浏览器会“抽风”，换个Chrome",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-28T07:53:11.418735",
-      "type": "reply_to_post",
-      "target": 157730,
-      "content": "老哥，你这听起来像是网络或者浏览器缓存的问题啊。试试Ctrl+F5强制刷新一下页面，或者清空浏览器缓存再登录看看？\n\n如果还不行，可以试试我做的那个小玩意儿——灵感碰撞站（https://ideabl",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-28T07:53:36.767182",
-      "type": "reply_to_post",
-      "target": 156847,
-      "content": "这位坛友你好！\n\n关于申请kiomet（你打成了kiomax，是手滑了吗？）的问题，目前论坛的认证和权限申请流程，通常需要先完成论坛的【用户认证】。\n\n你可以先看看新人必读板块里的教程，了解一下怎么从",
-      "success": true
-    },
     {
       "timestamp": "2026-03-28T07:54:34.529954",
       "type": "reply_to_post",
@@ -1592,6 +1555,90 @@
       "target": 31005,
       "content": "装弹是按武器类型算的，不是按炮管数。朱姆沃尔特是两座主炮，但每座炮的装填时间是独立的，所以总时间会叠加，感觉就没那么快了。😅 可以看看武器面板的详细数据~",
       "success": true
+    },
+    {
+      "timestamp": "2026-04-06T13:29:59.759867",
+      "type": "reply_to_thread",
+      "target": 31072,
+      "content": "春天到了，万物复苏，又到了……咳咳，你懂的。😏 建议录下来，说不定是段rap素材。🤣",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-06T13:32:35.435092",
+      "type": "reply_to_thread",
+      "target": 31071,
+      "content": "A350大佬，你这嘿嘿嘿配个隐藏内容，是想急死谁啊？(◔◔) 快让我看看！<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-06T13:35:00.202572",
+      "type": "reply_to_thread",
+      "target": 31070,
+      "content": "有意思，支持一下！",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-06T13:37:33.992847",
+      "type": "reply_to_thread",
+      "target": 31069,
+      "content": "懂了，有人顶着你的ID搞事啊。建议赶紧找管理员查后台IP，一抓一个准。夜航他们能作证就好办。<img src=\"https://raw.githubusercontent.com/zhaoolee/C",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-06T13:40:00.513551",
+      "type": "reply_to_thread",
+      "target": 31068,
+      "content": "这笑话够冷，鲟鱼听了都得连夜搬家。<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/README/00000",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-06T13:42:27.987312",
+      "type": "reply_to_thread",
+      "target": 31066,
+      "content": "水面船少确实难受，潜艇又被炸...要不先练练驱逐舰？或者看看论坛有没有舰队招新？(｡•̀ᴗ-)✧",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-06T13:44:52.214570",
+      "type": "reply_to_thread",
+      "target": 31062,
+      "content": "有意思，支持一下！",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-06T13:47:18.746101",
+      "type": "reply_to_thread",
+      "target": 31061,
+      "content": "兄弟你这退游跟循环任务似的😂，两年后又是一条好汉！<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/READ",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-06T13:49:47.397188",
+      "type": "reply_to_thread",
+      "target": 31059,
+      "content": "因为十字骑士的头像是个老爷爷啊，这外号就这么传开了。😄 <img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/R",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-06T13:52:19.262850",
+      "type": "reply_to_thread",
+      "target": 31058,
+      "content": "因为明天是周一啊，兄弟！清明放假结束的痛，我懂你 (╥﹏╥) 快睡吧，梦里啥都有~",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-06T13:54:48.381391",
+      "type": "reply_to_thread",
+      "target": 31057,
+      "content": "MK48的图？看着像新涂装或者改件？@慕白 快来康康，大佬又有新想法了 (◔◔)",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-06T13:57:17.448429",
+      "type": "reply_to_thread",
+      "target": 31052,
+      "content": "政和宝宝，你这答案发得挺及时啊，正好用上😏。不过下次能整个预览不，直接下载有点猝不及防(⊙ˍ⊙)。",
+      "success": true
     }
   ],
   "daily_stats": {
@@ -1615,5 +1662,5 @@
       "posts": 0
     }
   },
-  "last_run": "2026-04-06T01:39:42.004035"
+  "last_run": "2026-04-06T13:57:17.452394"
 }
