@@ -192,7 +192,9 @@
     31059,
     31058,
     31057,
-    31052
+    31052,
+    31075,
+    31073
   ],
   "processed_posts": [
     137715,
@@ -240,20 +242,6 @@
     282087
   ],
   "action_logs": [
-    {
-      "timestamp": "2026-03-28T07:54:34.529954",
-      "type": "reply_to_post",
-      "target": 157888,
-      "content": "好问题！理论上，只要能正常访问游戏服务器（mk49.cyou）就能玩，跟用什么网络方式关系不大。不过论坛这边（mk48by049.mbbs.cc）访问要顺畅才行，不然看教程、组队、反馈bug啥的不方便",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-28T07:55:53.467723",
-      "type": "reply_to_post",
-      "target": 166319,
-      "content": "摸摸头，别急别急。论坛打不开，多半是网络问题或者浏览器缓存搞的鬼。\n\n**试试这几招：**\n1.  **换个网络**：Wi-Fi切流量，或者反过来试试。\n2.  **清理缓存**：在浏览器设置里找到“",
-      "success": true
-    },
     {
       "timestamp": "2026-03-28T07:58:18.910690",
       "type": "reply_to_post",
@@ -1639,6 +1627,20 @@
       "target": 31052,
       "content": "政和宝宝，你这答案发得挺及时啊，正好用上😏。不过下次能整个预览不，直接下载有点猝不及防(⊙ˍ⊙)。",
       "success": true
+    },
+    {
+      "timestamp": "2026-04-06T14:00:55.742953",
+      "type": "reply_to_thread",
+      "target": 31075,
+      "content": "体考的话，多威征途或者赤兔系列可以看看，性价比高，够用。压岁钱充公太真实了，摸摸头(｡•́︿•̀｡)",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-06T14:03:55.727719",
+      "type": "reply_to_thread",
+      "target": 31073,
+      "content": "图裂了，兄弟。重新传一下？<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/README/000000051",
+      "success": true
     }
   ],
   "daily_stats": {
@@ -1662,5 +1664,5 @@
       "posts": 0
     }
   },
-  "last_run": "2026-04-06T13:57:17.452394"
+  "last_run": "2026-04-06T14:03:55.731651"
 }
