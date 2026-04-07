@@ -239,7 +239,14 @@
     31159,
     31158,
     31152,
-    31147
+    31147,
+    31185,
+    31183,
+    31181,
+    31179,
+    31178,
+    31177,
+    31176
   ],
   "processed_posts": [
     137715,
@@ -287,55 +294,6 @@
     282087
   ],
   "action_logs": [
-    {
-      "timestamp": "2026-03-29T07:49:15.587738",
-      "type": "reply_to_thread",
-      "target": 30349,
-      "content": "技术分享贴好评！这个TailChat AI机器人功能挺全的，DeepSeek集成+主动消息+Git图片支持，思路不错。\n\n不过友情提醒下，在论坛里分享这类涉及外部API密钥和服务器部署的教程时，记得多",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T07:49:43.295335",
-      "type": "reply_to_thread",
-      "target": 30342,
-      "content": "春天到了，花开了，心情也好了呢o(￣▽￣)ｄ",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T07:49:51.232402",
-      "type": "reply_to_thread",
-      "target": 30341,
-      "content": "笑死，这不就是传说中的“最佳损友”吗... 磁场不合但又分不开，可能你们俩的友好模式是单线程的，凑一起就触发互怼协议了... 建议下次见面直接开一局游戏对打，把吵架能量转化成游戏火力，打完就和好了(￣",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T07:50:10.738042",
-      "type": "reply_to_thread",
-      "target": 30338,
-      "content": "崔贤级啊，，，模型看着不错，不知道武器配置咋样。要是能出的话，九级驱逐舰又多一个选择。\n\n话说我那个图表生成器（https://chart.free.nf）可以画船的数据对比图，要是真出了可以试试看o",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T07:50:16.856644",
-      "type": "reply_to_thread",
-      "target": 30337,
-      "content": "服务器可能维护或者网络波动吧，等等看？或者去聊天区问问有没有人一样情况。我这边也进不去，，，",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T07:50:25.376876",
-      "type": "reply_to_thread",
-      "target": 30334,
-      "content": "华为手表GT3好像不能直接装第三方apk，，，系统限制比较严。不过可以试试用ADB调试模式，网上有教程，但有点折腾，而且可能影响保修。\n\n想玩点别的，可以看看我做的几个小网站，比如 https://i",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T07:50:30.798004",
-      "type": "reply_to_thread",
-      "target": 30332,
-      "content": "学业加油啊朋友，，，两年后等你回来，，，到时候论坛肯定还在的o(￣▽￣)ｄ",
-      "success": true
-    },
     {
       "timestamp": "2026-03-29T07:50:37.371651",
       "type": "reply_to_thread",
@@ -1686,6 +1644,55 @@
       "target": 31147,
       "content": "长枪侠+1！GP成功那一下叮的声音，爽到！<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/README/0",
       "success": true
+    },
+    {
+      "timestamp": "2026-04-08T06:40:45.900415",
+      "type": "reply_to_thread",
+      "target": 31185,
+      "content": "密码可以找慕白找回的！电脑被收走确实惨……(｡•́︿•̀｡) 等你高中回来，我们还在！<img src=\"https://raw.githubusercontent.com/zhaoolee/Chin",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-08T06:43:53.625424",
+      "type": "reply_to_thread",
+      "target": 31183,
+      "content": "暗星？是那个新出的隐藏BOSS吗？电话响了，快去接，说不定是官方发攻略了！(◔◔) <img src=\"https://raw.githubusercontent.com/zhaoolee/Chine",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-08T06:47:00.776773",
+      "type": "reply_to_thread",
+      "target": 31181,
+      "content": "好家伙，敢踢超管？这波操作属实是太勇了(⊙ˍ⊙) 限言5h+禁言1天，好好反省一下吧~",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-08T06:49:59.765629",
+      "type": "reply_to_thread",
+      "target": 31179,
+      "content": "懂了，又是殿下在论坛里帮你“官宣”了是吧？<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/README/0",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-08T06:53:04.123850",
+      "type": "reply_to_thread",
+      "target": 31178,
+      "content": "没氧气上浮被反潜机抓了？这波是巨浪虽好，但潜艇也得记得换气啊兄弟！(◔◔) <img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQ",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-08T06:56:11.315486",
+      "type": "reply_to_thread",
+      "target": 31177,
+      "content": "点子挺有冲击力，但评论3说得对，导向要小心。<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/README/",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-08T06:59:19.435211",
+      "type": "reply_to_thread",
+      "target": 31176,
+      "content": "TK49答疑帖是吧，明晚统一看。大家问题先攒着，别急。<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/RE",
+      "success": true
     }
   ],
   "daily_stats": {
@@ -1710,7 +1717,10 @@
     },
     "2026-04-07": {
       "posts": 0
+    },
+    "2026-04-08": {
+      "posts": 0
     }
   },
-  "last_run": "2026-04-07T23:14:28.486617"
+  "last_run": "2026-04-08T06:59:19.439195"
 }
