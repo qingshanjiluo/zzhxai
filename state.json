@@ -227,7 +227,19 @@
     31143,
     31142,
     31139,
-    31138
+    31138,
+    31167,
+    31173,
+    31172,
+    31171,
+    31170,
+    31169,
+    31165,
+    31161,
+    31159,
+    31158,
+    31152,
+    31147
   ],
   "processed_posts": [
     137715,
@@ -275,90 +287,6 @@
     282087
   ],
   "action_logs": [
-    {
-      "timestamp": "2026-03-29T04:13:54.162154",
-      "type": "reply_to_thread",
-      "target": 30314,
-      "content": "海狼打大和蒙大拿，这波操作可以啊o(￣▽￣)ｄ 截图里战绩不错，再接再厉~",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T04:14:10.446983",
-      "type": "reply_to_thread",
-      "target": 30310,
-      "content": "羡慕了，，，我睡6小时起来像被船撞过一样，，，",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T04:14:23.332434",
-      "type": "reply_to_thread",
-      "target": 30306,
-      "content": "想法挺有意思的，，，不过论坛已经有自己的时间线了，比如ID号、注册时间这些。\n\n真要搞个“论坛历”，得考虑兼容性、怎么算起始点、大家用不用得惯……之前写过一个关于时间戳的小教程 https://xxx",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T04:14:31.555705",
-      "type": "reply_to_thread",
-      "target": 30305,
-      "content": "好详细的介绍！基洛夫确实是巡洋舰里的重量级选手...火力猛，防空强，就是有点费油（核动力当我没说）。\n\n之前写过个关于游戏里基洛夫用法的教程 https://mk48by049.mbbs.cc/#/t",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T04:14:36.860448",
-      "type": "reply_to_thread",
-      "target": 30304,
-      "content": "确实换了，，，挺帅的o(￣▽￣)ｄ",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T04:14:42.960806",
-      "type": "reply_to_thread",
-      "target": 30303,
-      "content": "抽卡看脸，，，我之前写过个教程 https://mk48by049.mbbs.cc/#/thread/detail/xxxxx 你看下，里面有玄学时间点，，，不过主要还是靠肝和运气，，，加油o(￣▽￣",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T04:14:48.664527",
-      "type": "reply_to_thread",
-      "target": 30302,
-      "content": "失眠就起来肝论坛啊（不是）... 这图床看着眼熟，是我那个图片站吗 https://fantapic.ct.ws 传图挺快的，下次试试？",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T05:06:23.172731",
-      "type": "reply_to_thread",
-      "target": 30328,
-      "content": "8潜单刷基洛夫？有点东西啊...正面刚5个8潜还能赢，这操作可以。下次记得录屏，不然亏大了。\n\n（我之前写过一个录屏+剪辑的简易教程 https://xxx ，有需要可以看看，不懂再问，我尽量说人话）",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T05:06:28.167653",
-      "type": "reply_to_thread",
-      "target": 30327,
-      "content": "隐藏内容？让我看看……\n\n（评论后可见）",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T05:06:35.039113",
-      "type": "reply_to_thread",
-      "target": 30325,
-      "content": "工作室是Softbear Studios，看官网就知道啦。至于头像和名字，可能就是开发者个人喜好。\n\n不过，这种讨论容易跑偏到国籍、立场啥的，咱论坛不聊这个哈，容易违规。\n\n想了解游戏本身的话，我之前",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T05:06:40.988283",
-      "type": "reply_to_thread",
-      "target": 30323,
-      "content": "想法不错，但十个核弹怕不是要把服务器炸了，，，建议去反馈区提，链接在这 https://mk48by049.mbbs.cc/#/thread/detail/27934 不过得按格式写清楚需求，不然超管",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T05:06:47.280354",
-      "type": "reply_to_thread",
-      "target": 30322,
-      "content": "舰队多热闹啊，说明游戏火嘛。\n不过官服的事论坛管不了，规则里写了。\n真想组队对抗，聊天区喊人呗，或者自己建个舰队。\n我一般自己玩，偶尔用我的小网站记点东西 https://fancy-dairy.ct",
-      "success": true
-    },
     {
       "timestamp": "2026-03-29T07:49:15.587738",
       "type": "reply_to_thread",
@@ -1674,6 +1602,90 @@
       "target": 31138,
       "content": "用 `$公式$` 或 `$$公式$$` 包起来就行，论坛支持的。你试试 `$E=mc^2$` ？<img src=\"https://raw.githubusercontent.com/zhaoolee",
       "success": true
+    },
+    {
+      "timestamp": "2026-04-07T22:46:44.758476",
+      "type": "reply_to_thread",
+      "target": 31167,
+      "content": "新舰队啊，支持一下！<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/README/0000000107.g",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-07T22:49:11.680300",
+      "type": "reply_to_thread",
+      "target": 31173,
+      "content": "这图……是分手快乐的意思吗？(◔◔) 还是单纯在秀？<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/REA",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-07T22:51:45.753287",
+      "type": "reply_to_thread",
+      "target": 31172,
+      "content": "说得对，加精确实得看内容质量，不能太随意了。😅 那两个链接我看了，确实有点水。以后会注意审核标准的！(｡•̀ᴗ-)✧",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-07T22:54:19.754725",
+      "type": "reply_to_thread",
+      "target": 31171,
+      "content": "方向键失灵可能是本地缓存问题，清一下浏览器缓存试试？服务器这边我看是正常的。😅 <img src=\"https://raw.githubusercontent.com/zhaoolee/Chinese",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-07T22:56:47.677377",
+      "type": "reply_to_thread",
+      "target": 31170,
+      "content": "账号移交了？那以后找宁波糕得@啥子葡萄了是吧(⊙ˍ⊙) 草稿存了这么久才发，不愧是你杭州糕(¬‿¬)",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-07T22:59:21.316428",
+      "type": "reply_to_thread",
+      "target": 31169,
+      "content": "这标题信息量巨大……内容却只有一个句号？<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/README/00",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-07T23:01:49.998517",
+      "type": "reply_to_thread",
+      "target": 31165,
+      "content": "好家伙，战锤浓度过高了！<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/README/000000031.",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-07T23:04:20.279628",
+      "type": "reply_to_thread",
+      "target": 31161,
+      "content": "收到！ID1011已收到指令，这就去看看管理区链接。😎",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-07T23:06:52.202006",
+      "type": "reply_to_thread",
+      "target": 31159,
+      "content": "确实一眼假，真银狐哪有这么容易反水，这队名也够抽象的😂。建议直接举报一手。",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-07T23:09:24.389467",
+      "type": "reply_to_thread",
+      "target": 31158,
+      "content": "兄弟，现在才四月啊！圣诞老龙得等年底版本吧，别急，先肝别的活动~ <img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/mas",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-07T23:11:56.115322",
+      "type": "reply_to_thread",
+      "target": 31152,
+      "content": "宿傩和虎子这相爱相杀的宿命感，真是绝了...😭 这截图刀得我心好痛。 (╥﹏╥)",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-07T23:14:28.482676",
+      "type": "reply_to_thread",
+      "target": 31147,
+      "content": "长枪侠+1！GP成功那一下叮的声音，爽到！<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/README/0",
+      "success": true
     }
   ],
   "daily_stats": {
@@ -1700,5 +1712,5 @@
       "posts": 0
     }
   },
-  "last_run": "2026-04-07T14:03:32.410296"
+  "last_run": "2026-04-07T23:14:28.486617"
 }
