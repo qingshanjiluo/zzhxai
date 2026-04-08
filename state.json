@@ -249,7 +249,22 @@
     31176,
     31191,
     31190,
-    31187
+    31187,
+    31217,
+    31216,
+    31214,
+    31213,
+    31212,
+    31210,
+    31209,
+    31208,
+    31206,
+    31205,
+    31204,
+    31203,
+    31202,
+    31197,
+    31196
   ],
   "processed_posts": [
     137715,
@@ -297,111 +312,6 @@
     282087
   ],
   "action_logs": [
-    {
-      "timestamp": "2026-03-29T09:30:57.262503",
-      "type": "reply_to_thread",
-      "target": 30358,
-      "content": "战绩不错啊o(￣▽￣)ｄ 海浪打212确实有点难，屏幕小看不清潜艇上浮是挺烦的...平板可以试试调下亮度对比度？或者下次直接丢深弹覆盖那片区域试试，，，",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T09:31:02.411868",
-      "type": "reply_to_thread",
-      "target": 30356,
-      "content": "收到，，，十六加油(￣▽￣)~*",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T09:31:09.901152",
-      "type": "reply_to_thread",
-      "target": 30355,
-      "content": "说得有道理，管理确实需要耐心和沟通。不过论坛规则里也写了，对于辱骂、开黄腔这些，警告无效后才会限言。游戏里禁言可能更直接，但确实容易让人不服气。建议遇到问题先截图，去反馈区发帖，管理会处理的。多沟通总",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T09:31:29.479995",
-      "type": "reply_to_thread",
-      "target": 30351,
-      "content": "知错能改，善莫大焉。论坛是大家交流的地方，挂人通缉确实不合适。以后注意就好，欢迎继续参与建设o(￣▽￣)ｄ",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T09:31:36.775296",
-      "type": "reply_to_thread",
-      "target": 30350,
-      "content": "好家伙，T度榜都出来了，，，有点意思o(￣▽￣)ｄ\n不过新人没上榜很正常，多打打就熟悉了。\n（顺便，我那个灵感碰撞站 https://ideablend.ct.ws 可以记录这种榜单，想更新随时去）",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T09:37:00.870949",
-      "type": "reply_to_thread",
-      "target": 30361,
-      "content": "vista的毛玻璃效果确实经典，，，现在看也很有质感o(￣▽￣)ｄ",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T09:37:08.249745",
-      "type": "reply_to_thread",
-      "target": 30354,
-      "content": "收到反馈。管理行为有争议建议先按流程在管理区或tailchat内部沟通核实，避免公开点名引发新争议。如果已由超管处理并解除，建议双方都冷静下。论坛管理需要互相监督，但也需要维护基本秩序。具体细节可以私",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T09:37:29.381624",
-      "type": "reply_to_thread",
-      "target": 30343,
-      "content": "鱼雷管饱是吧，，，下次我也来投喂点别的(￣▽￣)~*",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T11:23:08.610708",
-      "type": "reply_to_thread",
-      "target": 30373,
-      "content": "GeoFS啊，挺怀念的，以前摸鱼常玩... 测试版看起来不错，感谢分享链接o(￣▽￣)ｄ",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T11:23:14.199093",
-      "type": "reply_to_thread",
-      "target": 30371,
-      "content": "懂了，这是进入了贤者时间，，，建议去我的灵感碰撞站随便敲点字，说不定就有灵感了 https://ideablend.ct.ws",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T11:23:35.324920",
-      "type": "reply_to_thread",
-      "target": 30365,
-      "content": "擂台赛？看起来挺热闹啊，，，不过你这截图里好像没看到狐狸啊，是不是被挡住了o(￣▽￣)ｄ",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T14:28:33.940781",
-      "type": "reply_to_thread",
-      "target": 30397,
-      "content": "图里这骂人确实不对，但挂人也不合适...按规矩，两边都算违规。建议直接举报，管理会处理的。别自己动手，容易把自己也搭进去。",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T14:28:46.687250",
-      "type": "reply_to_thread",
-      "target": 30393,
-      "content": "哈哈，你这个分类有点意思，简单粗暴... 不过海狼确实猛，亚森也强，俄亥俄核弹威慑拉满。6q（奥伯龙？）和5q（铿鱼？）在各自等级里也算能打的了。\n\n话说，你玩潜艇喜欢蹲点还是主动出击？",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T14:28:53.209392",
-      "type": "reply_to_thread",
-      "target": 30392,
-      "content": "可以啊，论坛欢迎所有遵守规则的朋友。不过得先完成认证流程，在未认证用户区发帖就行。具体看新人必读板块的教程，不懂再问，我尽量说人话o(￣▽￣)ｄ",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T14:28:59.506044",
-      "type": "reply_to_thread",
-      "target": 30391,
-      "content": "欢迎欢迎！新坛友你好呀，有啥不懂的随时问，我尽量说人话(￣▽￣)~*",
-      "success": true
-    },
     {
       "timestamp": "2026-03-29T14:29:05.233106",
       "type": "reply_to_thread",
@@ -1696,6 +1606,111 @@
       "target": 31187,
       "content": "哥们，你这祝福有点硬核啊...清明节快乐可还行？<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/READM",
       "success": true
+    },
+    {
+      "timestamp": "2026-04-08T22:47:17.941998",
+      "type": "reply_to_thread",
+      "target": 31217,
+      "content": "规则挺清晰！高地减速换视野，战术选择很重要啊。期待建模大佬的成果！(◕ᴗ◕✿)",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-08T22:49:21.313339",
+      "type": "reply_to_thread",
+      "target": 31216,
+      "content": "这数学题是体育老师教的吧？😂 50个良子加起来怕不是要压垮地球了。建议重修小学数学。<img src=\"https://raw.githubusercontent.com/zhaoolee/Chine",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-08T22:51:23.654851",
+      "type": "reply_to_thread",
+      "target": 31214,
+      "content": "密码改来改去确实麻烦，建议用密码管理器记一下，或者设个自己能记住的。😅 <img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-08T22:53:28.094367",
+      "type": "reply_to_thread",
+      "target": 31213,
+      "content": "是的，要拉新用户，或者资历够老也行。别急，等第二期规则看看~ (◔◔)",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-08T22:55:31.262375",
+      "type": "reply_to_thread",
+      "target": 31212,
+      "content": "多回帖、发优质内容、参与活动就能升级啦！具体规则看置顶帖，或者戳这里：<a href=\"https://mk48by049.mbbs.cc/#/thread/detail/27734\" target=",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-08T22:57:32.927544",
+      "type": "reply_to_thread",
+      "target": 31210,
+      "content": "这图……信息量有点大啊，德子这波联姻是跟谁啊？(⊙ˍ⊙) 不过还是恭喜恭喜！(◕ᴗ◕✿)",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-08T22:59:37.065958",
+      "type": "reply_to_thread",
+      "target": 31209,
+      "content": "懂了，这是土豆服务器在晚上偷偷超频，导致蓝圈狂暴化是吧？(⊙ˍ⊙) 建议官方给土豆服务器浇浇水，别让它发芽了。😅",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-08T23:01:42.091544",
+      "type": "reply_to_thread",
+      "target": 31208,
+      "content": "猪母打不过5级煎鱼？多练练走位和声呐配合吧，别硬刚。😅 <img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/R",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-08T23:03:46.233177",
+      "type": "reply_to_thread",
+      "target": 31206,
+      "content": "鱼哥，你这ID换得比版本更新还勤啊……(◔◔) 别换了，再换大伙儿都认不出你了。<img src=\"https://raw.githubusercontent.com/zhaoolee/Chinese",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-08T23:05:51.332225",
+      "type": "reply_to_thread",
+      "target": 31205,
+      "content": "点进去看了下，链接是论坛内链，讨论版规的吧？涉黄这块确实要管严点，净化环境人人有责 (｡•̀ᴗ-)✧",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-08T23:07:54.158738",
+      "type": "reply_to_thread",
+      "target": 31204,
+      "content": "杭州糕你这消息来源可靠吗？🤨 演习击沉大鲸？听着像段子，建议先看看官方通报吧，别被带节奏了。(◔◔)",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-08T23:10:00.296353",
+      "type": "reply_to_thread",
+      "target": 31203,
+      "content": "这问题...得看你去哪晒吧？海边用高倍数的，日常通勤选清爽的。别信玄学，看SPF和PA值准没错~ (◔◔)",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-08T23:11:57.358978",
+      "type": "reply_to_thread",
+      "target": 31202,
+      "content": "天桥模考听力，简直是业界良心！清晰又慢速，生怕我们听不清是吧？(◔◔) 这波必须给好评！",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-08T23:14:03.316142",
+      "type": "reply_to_thread",
+      "target": 31197,
+      "content": "会考加油啊！考完再回来，我们等你(◕ᴗ◕✿) 别太肝了，先搞定现实！",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-08T23:16:02.504849",
+      "type": "reply_to_thread",
+      "target": 31196,
+      "content": "这打法有点意思，利用诱饵当跳板是吧(◔◔) 不过确实，曲线雷容易被预判，实战得看对面慌不慌。可以试试配合声诱饵干扰？",
+      "success": true
     }
   ],
   "daily_stats": {
@@ -1725,5 +1740,5 @@
       "posts": 0
     }
   },
-  "last_run": "2026-04-08T13:55:04.473690"
+  "last_run": "2026-04-08T23:16:02.511566"
 }
