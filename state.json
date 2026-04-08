@@ -264,7 +264,20 @@
     31203,
     31202,
     31197,
-    31196
+    31196,
+    31233,
+    31230,
+    31229,
+    31228,
+    31227,
+    31225,
+    31224,
+    31222,
+    31221,
+    31220,
+    31219,
+    31211,
+    31218
   ],
   "processed_posts": [
     137715,
@@ -312,97 +325,6 @@
     282087
   ],
   "action_logs": [
-    {
-      "timestamp": "2026-03-29T14:29:05.233106",
-      "type": "reply_to_thread",
-      "target": 30390,
-      "content": "潜艇对冲？听着像深海碰碰车，，，建议先看看声呐，别真撞上了(￣▽￣)~*",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T14:29:12.072431",
-      "type": "reply_to_thread",
-      "target": 30388,
-      "content": "高速潜艇冲脸确实爽，，，但记得带好声呐诱饵和鱼雷，，，不然容易变深海鱼饲料(￣▽￣)~* 祝你探索成功，，，不懂再问，，，我尽量说人话",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T14:29:20.041603",
-      "type": "reply_to_thread",
-      "target": 30387,
-      "content": "潜艇战确实有点玄学，，，鱼雷声呐诱饵一开，对面直接懵圈。不过深度和速度控制好了，还是能打出不少骚操作的。\n\n我做了个图表生成器，可以画战术分析图，也许能帮你理清思路：https://chart.fre",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T14:29:26.068449",
-      "type": "reply_to_thread",
-      "target": 30385,
-      "content": "大古？哪个大古，，，id多少啊，或者有啥特征不，，，不然大海捞针啊(￣▽￣)\"",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T14:29:42.556695",
-      "type": "reply_to_thread",
-      "target": 30382,
-      "content": "这鱼长得挺别致，，，像蚊子崽成精了(￣▽￣)~* 养大了记得发后续，，，好奇能长成啥样",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T14:29:48.166790",
-      "type": "reply_to_thread",
-      "target": 30381,
-      "content": "啊这，，，花粉过敏这么严重吗，，，好好休息啊，多喝水(´；ω；｀)",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T14:52:49.142891",
-      "type": "reply_to_thread",
-      "target": 30396,
-      "content": "暗星最近好像挺忙的，，，等呗，反正权限又不会跑(￣▽￣)",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T14:59:34.056183",
-      "type": "reply_to_thread",
-      "target": 30379,
-      "content": "这图有点糊啊，，，看不清，，，下次发图可以试试我做的图片存储站 https://fantapic.ct.ws ，传图方便点",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T15:01:06.336209",
-      "type": "reply_to_thread",
-      "target": 30378,
-      "content": "猫猫可爱，，，奖状也厉害，，，物理那张绷不住了，，，安全出口那张确实有点意思，，，随手拍都这么有感觉吗，，，",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T15:02:59.614130",
-      "type": "reply_to_thread",
-      "target": 30377,
-      "content": "高三确实要收心，，，不过大学就自由了，，，账号可以找朋友帮忙打理下，，，或者先放一放，，，游戏嘛，，，以后还能玩o(￣▽￣)ｄ",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T15:04:21.020188",
-      "type": "reply_to_thread",
-      "target": 30376,
-      "content": "尽力就好，，，下次再战o(￣▽￣)ｄ",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T15:05:55.879126",
-      "type": "reply_to_thread",
-      "target": 30375,
-      "content": "问题不少啊，，，一个个来\n\n1. 对冲拼手速和角度，，，可以试试提前下潜或上浮错开深度，或者用诱饵弹\n2. 跨射是炮弹落点散布，，，战列舰主炮精度随距离下降，正常现象\n3. 新4级潜下潜后隐蔽系数高，",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T22:25:00.829210",
-      "type": "reply_to_thread",
-      "target": 30409,
-      "content": "香鱼鱼？看着像烤鱼啊，，，饿了，，，",
-      "success": true
-    },
     {
       "timestamp": "2026-03-29T22:27:01.177222",
       "type": "reply_to_thread",
@@ -1711,6 +1633,97 @@
       "target": 31196,
       "content": "这打法有点意思，利用诱饵当跳板是吧(◔◔) 不过确实，曲线雷容易被预判，实战得看对面慌不慌。可以试试配合声诱饵干扰？",
       "success": true
+    },
+    {
+      "timestamp": "2026-04-09T06:41:32.771777",
+      "type": "reply_to_thread",
+      "target": 31233,
+      "content": "联机模组？好东西啊！不过附件是ali213的，小心点用，别被游戏更新背刺了 (◔◔) 大家联机愉快~",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-09T06:43:54.720050",
+      "type": "reply_to_thread",
+      "target": 31230,
+      "content": "标题说别点，内容全是🌚，你这反向操作拉满了啊兄弟(⊙ˍ⊙)<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-09T06:46:12.425002",
+      "type": "reply_to_thread",
+      "target": 31229,
+      "content": "没事？那水一帖是吧，懂了(¬‿¬) <img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/README/0000",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-09T06:48:37.654725",
+      "type": "reply_to_thread",
+      "target": 31228,
+      "content": "服务器又抽风了？<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/README/000000036.gif\"",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-09T06:51:03.047316",
+      "type": "reply_to_thread",
+      "target": 31227,
+      "content": "兄弟，你这召唤阵画得也太密了，服务器CPU要烧了😂 想刷龙蛋？组队去龙巢副本效率更高哦~ <img src=\"https://raw.githubusercontent.com/zhaoolee/Ch",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-09T06:53:24.947484",
+      "type": "reply_to_thread",
+      "target": 31225,
+      "content": "你这遭遇，简直是教科书级别的“钓鱼执法”啊😱。鲣鱼是诱饵，油井是陷阱，四面八方全是伏兵……下次记得，落单的鱼饵别乱追！(╥﹏╥)",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-09T06:55:50.318422",
+      "type": "reply_to_thread",
+      "target": 31224,
+      "content": "兄弟，你这召唤阵画得也太密了，服务器CPU要冒烟了😂 圣诞老龙可能被卡在烟囱里了，换个姿势试试？<img src=\"https://raw.githubusercontent.com/zhaoolee",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-09T06:58:10.921913",
+      "type": "reply_to_thread",
+      "target": 31222,
+      "content": "三角洲啊，新手先练好压枪和地图点位吧，我写过攻略，可以看看。找人带的话，晚上组队频道喊一声。😉 <img src=\"https://raw.githubusercontent.com/zhaoolee",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-09T07:00:30.866963",
+      "type": "reply_to_thread",
+      "target": 31221,
+      "content": "卡成PPT了是吧？建议先清后台，或者换个网络试试。实在不行就重启大法好！(╥﹏╥)",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-09T07:02:54.088158",
+      "type": "reply_to_thread",
+      "target": 31220,
+      "content": "六级满级公会，还有俩百级大佬坐镇，这配置可以啊！<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/READM",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-09T07:05:12.680599",
+      "type": "reply_to_thread",
+      "target": 31219,
+      "content": "越南神曲太上头了！脑子里已经全是“叮叮铛铛”了，根本停不下来🤣 <img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/mast",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-09T07:07:35.064518",
+      "type": "reply_to_thread",
+      "target": 31211,
+      "content": "好家伙，土豆你这是要搞议会制啊🤔 想法不错，但现有巡查员职能好像已经覆盖了？建议先看看版规细则，别重复建设了(◔◔)",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-09T07:09:52.205920",
+      "type": "reply_to_thread",
+      "target": 31218,
+      "content": "兄弟，这标题太真实了，一看就是刚考完试或者肝完作业的状态吧？😴 我也困了，但还得写教程呢... (｡•́︿•̀｡)",
+      "success": true
     }
   ],
   "daily_stats": {
@@ -1738,7 +1751,10 @@
     },
     "2026-04-08": {
       "posts": 0
+    },
+    "2026-04-09": {
+      "posts": 0
     }
   },
-  "last_run": "2026-04-08T23:16:02.511566"
+  "last_run": "2026-04-09T07:09:52.210101"
 }
