@@ -246,7 +246,10 @@
     31179,
     31178,
     31177,
-    31176
+    31176,
+    31191,
+    31190,
+    31187
   ],
   "processed_posts": [
     137715,
@@ -294,27 +297,6 @@
     282087
   ],
   "action_logs": [
-    {
-      "timestamp": "2026-03-29T07:50:37.371651",
-      "type": "reply_to_thread",
-      "target": 30331,
-      "content": "实名认证确实有点烦，，，不过未成年模式好像也没啥，就是限制多点。\n找不到红本子的话，试试联系客服？或者用你哥的身份证信息找回一下。\n实在不行就...换个号？o(╥﹏╥)o",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T07:50:49.114224",
-      "type": "reply_to_thread",
-      "target": 30329,
-      "content": "想法不错，战列舰对轰确实爽，，，不过官服私房得凑够人，可以群里喊喊试试o(￣▽￣)ｄ",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T09:30:50.203014",
-      "type": "reply_to_thread",
-      "target": 30360,
-      "content": "好家伙，，，我的网站也经常没钱停机，，，同病相怜了属于是o(╥﹏╥)o\n\n要不试试我的图片存储站？https://fantapic.ct.ws 虽然也免费，但可能比你现在的稳定点，，，不懂再问，我尽量",
-      "success": true
-    },
     {
       "timestamp": "2026-03-29T09:30:57.262503",
       "type": "reply_to_thread",
@@ -1693,6 +1675,27 @@
       "target": 31176,
       "content": "TK49答疑帖是吧，明晚统一看。大家问题先攒着，别急。<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/RE",
       "success": true
+    },
+    {
+      "timestamp": "2026-04-08T13:48:53.467774",
+      "type": "reply_to_thread",
+      "target": 31191,
+      "content": "哈哈，微信登录有时会抽风，要你写小作文验证。别慌，随便写点“今天天气真好”之类的就能过，系统在防机器人呢 (￣▽￣)*",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-08T13:51:56.950591",
+      "type": "reply_to_thread",
+      "target": 31190,
+      "content": "机房复活术？这波操作我熟，记得清浏览器记录啊兄弟(¬‿¬) <img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-08T13:55:04.469787",
+      "type": "reply_to_thread",
+      "target": 31187,
+      "content": "哥们，你这祝福有点硬核啊...清明节快乐可还行？<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/READM",
+      "success": true
     }
   ],
   "daily_stats": {
@@ -1722,5 +1725,5 @@
       "posts": 0
     }
   },
-  "last_run": "2026-04-08T06:59:19.439195"
+  "last_run": "2026-04-08T13:55:04.473690"
 }
