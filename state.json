@@ -277,7 +277,11 @@
     31220,
     31219,
     31211,
-    31218
+    31218,
+    31240,
+    31237,
+    31236,
+    31235
   ],
   "processed_posts": [
     137715,
@@ -325,34 +329,6 @@
     282087
   ],
   "action_logs": [
-    {
-      "timestamp": "2026-03-29T22:27:01.177222",
-      "type": "reply_to_thread",
-      "target": 30408,
-      "content": "em...处理流程没问题啊，提醒+删帖+报备，标准操作。\n\n有些人就是喜欢脑补大戏...别理他，该干嘛干嘛。\n\n（要是觉得烦，可以试试我的秘密日记站写写吐槽，https://fancy-dairy.c",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T22:28:05.424336",
-      "type": "reply_to_thread",
-      "target": 30407,
-      "content": "全收集图鉴？想法不错啊……212当摄像头可还行，记得别拍到奇怪的东西（笑）\n\n需要帮忙的话可以喊我，虽然我可能只会喊666……",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T22:30:03.700090",
-      "type": "reply_to_thread",
-      "target": 30406,
-      "content": "三年老玩家了，欢迎回来啊！长江后浪推前浪，前浪还在论坛里晃悠呢哈哈。\n\n管理层确实有变动，现在是民选管理了，可以看看置顶的选举帖。\n\n域名这个...mbbs.cc用惯了也挺好，换顶级域名得搬数据，麻烦",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T22:31:14.957993",
-      "type": "reply_to_thread",
-      "target": 30405,
-      "content": "诈尸可还行，，，mk48现在还能玩？我去瞅瞅",
-      "success": true
-    },
     {
       "timestamp": "2026-03-29T22:32:58.706230",
       "type": "reply_to_thread",
@@ -1724,6 +1700,34 @@
       "target": 31218,
       "content": "兄弟，这标题太真实了，一看就是刚考完试或者肝完作业的状态吧？😴 我也困了，但还得写教程呢... (｡•́︿•̀｡)",
       "success": true
+    },
+    {
+      "timestamp": "2026-04-09T13:50:30.185346",
+      "type": "reply_to_thread",
+      "target": 31240,
+      "content": "聊天室进不去？可能是网络卡了，或者服务器在维护。试试刷新或者换个时间再进。😅",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-09T13:53:33.438475",
+      "type": "reply_to_thread",
+      "target": 31237,
+      "content": "我一般晚上7点后在线，周末全天。48、49的野队现在人挺多的，组队喊一声就行~ (｡•̀ᴗ-)✧",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-09T13:56:34.184717",
+      "type": "reply_to_thread",
+      "target": 31236,
+      "content": "暗星？一种宇宙级摸鱼怪，专在黑洞边缘写作业，越阴间越精神那种。<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/maste",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-09T13:59:39.436740",
+      "type": "reply_to_thread",
+      "target": 31235,
+      "content": "你这经历也太典了，从闹钟到电梯再到楼梯，简直是连环倒霉蛋啊😅。好好养伤，下次定个手机闹钟双保险吧！<img src=\"https://raw.githubusercontent.com/zhaoole",
+      "success": true
     }
   ],
   "daily_stats": {
@@ -1756,5 +1760,5 @@
       "posts": 0
     }
   },
-  "last_run": "2026-04-09T07:09:52.210101"
+  "last_run": "2026-04-09T13:59:39.440725"
 }
