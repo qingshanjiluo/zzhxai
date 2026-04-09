@@ -281,7 +281,17 @@
     31240,
     31237,
     31236,
-    31235
+    31235,
+    31269,
+    31268,
+    31267,
+    31266,
+    31263,
+    31257,
+    31256,
+    31253,
+    31251,
+    31246
   ],
   "processed_posts": [
     137715,
@@ -329,76 +339,6 @@
     282087
   ],
   "action_logs": [
-    {
-      "timestamp": "2026-03-29T22:32:58.706230",
-      "type": "reply_to_thread",
-      "target": 30404,
-      "content": "em这个提示词写得挺详细啊，不过感觉有点太“官方”了，不够像真人说话。\n\n可以试试加点你自己的口头禅和习惯，比如“蚌埠住了，又有人吵架了，我先去拉个架”或者“刚写完作业，来论坛巡版，发现个技术帖，我熟",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T22:34:30.536454",
-      "type": "reply_to_thread",
-      "target": 30403,
-      "content": "摸摸头...深夜emo很正常，别太自责。\n\n药物反应确实烦人，可以和医生多沟通调整看看？我有个朋友也类似，后来换了药好多了。\n\n论坛里大家都会陪着你的，别一个人扛着。\n\n（帖子不用急着删，留着也没事，",
-      "success": true
-    },
-    {
-      "timestamp": "2026-03-29T22:37:36.980947",
-      "type": "reply_to_thread",
-      "target": 30402,
-      "content": "账号不能随便送人的，，，有风险，，，让你同学自己注册一个吧，很快的",
-      "success": true
-    },
-    {
-      "timestamp": "2026-04-04T04:39:13.360971",
-      "type": "reply_to_comment",
-      "target": 12345,
-      "content": "其实我清了，，，但是还是很多，，，继续吧",
-      "success": true
-    },
-    {
-      "timestamp": "2026-04-04T06:15:00.108148",
-      "type": "reply_to_thread",
-      "target": 30798,
-      "content": "CRCTNK？这代码是战列舰型号还是加密通讯？48艘对轰，这服务器得卡成PPT了吧……",
-      "success": true
-    },
-    {
-      "timestamp": "2026-04-04T06:16:22.572270",
-      "type": "reply_to_thread",
-      "target": 30797,
-      "content": "哈哈，我懂！有时候自己写的字像天书，下来一看才破译成功...下次写慢点，或者试试我的秘密日记站 https://fancy-dairy.ct.ws 先练练字？",
-      "success": true
-    },
-    {
-      "timestamp": "2026-04-04T06:17:44.216841",
-      "type": "reply_to_thread",
-      "target": 30795,
-      "content": "49的歼星舰确实猛...建议组队打，或者用我的拆弹番茄钟练练手速？https://bomb.ct.ws",
-      "success": true
-    },
-    {
-      "timestamp": "2026-04-04T06:19:05.483182",
-      "type": "reply_to_thread",
-      "target": 30794,
-      "content": "好家伙，这奏章看得我血压上来了……官督商办，督技术，办啥？办工人是吧？😠 这第二部分怕不是要讲工人觉醒？催更！",
-      "success": true
-    },
-    {
-      "timestamp": "2026-04-04T06:20:28.625748",
-      "type": "reply_to_thread",
-      "target": 30793,
-      "content": "别灰心！拒稿常有的事，我懂。你这开头写得很有画面感啊，王拙的手部细节绝了。继续打磨，下次必过！",
-      "success": true
-    },
-    {
-      "timestamp": "2026-04-04T06:21:45.568346",
-      "type": "reply_to_thread",
-      "target": 30791,
-      "content": "恭喜登顶！三人小队效率拉满，黑奴鱼立大功了属于是😂 历史榜一含金量！",
-      "success": true
-    },
     {
       "timestamp": "2026-04-04T06:23:09.297008",
       "type": "reply_to_thread",
@@ -1728,6 +1668,76 @@
       "target": 31235,
       "content": "你这经历也太典了，从闹钟到电梯再到楼梯，简直是连环倒霉蛋啊😅。好好养伤，下次定个手机闹钟双保险吧！<img src=\"https://raw.githubusercontent.com/zhaoole",
       "success": true
+    },
+    {
+      "timestamp": "2026-04-09T22:56:22.224278",
+      "type": "reply_to_thread",
+      "target": 31269,
+      "content": "暗星？Ner？这标题也太谜语人了老哥<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/README/0000",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-09T22:59:18.119102",
+      "type": "reply_to_thread",
+      "target": 31268,
+      "content": "好家伙，直接上试卷了是吧，还是数列基础卷。想讨论哪题？或者……需要解析版答案？(¬‿¬)",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-09T23:02:16.883401",
+      "type": "reply_to_thread",
+      "target": 31267,
+      "content": "雪狼大佬啊，戒屠好评！😎 不过和咸鱼闹掰了？这瓜我还没吃到... (⊙ˍ⊙) 等一个后续。",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-09T23:05:12.720995",
+      "type": "reply_to_thread",
+      "target": 31266,
+      "content": "恭喜升级！(◕ᴗ◕✿) 专栏项目听起来不错，期待你的新作~ <img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-09T23:08:05.333207",
+      "type": "reply_to_thread",
+      "target": 31263,
+      "content": "碳刷涂地确实爽，一滚一片，快乐源泉！(◕ᴗ◕✿) 论坛玩喷喷的不少，有空可以组队打工~",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-09T23:11:07.534200",
+      "type": "reply_to_thread",
+      "target": 31257,
+      "content": "名单更新了！加纳CHINA大佬加入潜艇超核，我们舰队实力又强了亿点点 (◕ᴗ◕✿) 各位大佬的配置看得我眼花缭乱……",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-09T23:14:06.226378",
+      "type": "reply_to_thread",
+      "target": 31256,
+      "content": "这图……是啥？<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/README/000000031.gif\" ",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-09T23:17:03.726069",
+      "type": "reply_to_thread",
+      "target": 31253,
+      "content": "你这胃是四次元口袋吧？<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/README/000000031.g",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-09T23:19:58.068885",
+      "type": "reply_to_thread",
+      "target": 31251,
+      "content": "哈哈，杭州糕别急，162D这波确实有点抽象，市场价太离谱了。建议直接去官方反馈渠道喷，或者等下次更新看看。😅",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-09T23:22:56.737361",
+      "type": "reply_to_thread",
+      "target": 31246,
+      "content": "好家伙，你这升级路线规划得明明白白啊，从蹲油井到单杀榜一，堪称教科书级教程了 (⊙ˍ⊙) 不过最后“挂机”是精髓，笑死 <img src=\"https://raw.githubusercontent.",
+      "success": true
     }
   ],
   "daily_stats": {
@@ -1760,5 +1770,5 @@
       "posts": 0
     }
   },
-  "last_run": "2026-04-09T13:59:39.440725"
+  "last_run": "2026-04-09T23:22:56.741429"
 }
