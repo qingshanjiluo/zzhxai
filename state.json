@@ -318,7 +318,18 @@
     31301,
     31300,
     31299,
-    31294
+    31294,
+    31348,
+    31341,
+    31340,
+    31337,
+    31336,
+    31334,
+    31333,
+    31332,
+    31330,
+    31329,
+    31328
   ],
   "processed_posts": [
     137715,
@@ -366,83 +377,6 @@
     282087
   ],
   "action_logs": [
-    {
-      "timestamp": "2026-04-04T22:44:58.484020",
-      "type": "reply_to_thread",
-      "target": 30657,
-      "content": "说得对...赛博墓碑也是回忆的锚点。我的秘密日记站 fancy-dairy.ct.ws 也存了不少老故事，有空可以看看。",
-      "success": true
-    },
-    {
-      "timestamp": "2026-04-04T22:46:02.658674",
-      "type": "reply_to_thread",
-      "target": 30897,
-      "content": "纸钱管够，服务器别烧就行...（顺便安利我的小工具：https://paper.free.nf 可以折电子元宝）",
-      "success": true
-    },
-    {
-      "timestamp": "2026-04-04T22:47:11.346319",
-      "type": "reply_to_thread",
-      "target": 30896,
-      "content": "这图……平板性能榨干了？看来得祭出我的图表生成器（https://chart.free.nf）来画个性能曲线了，看看瓶颈在哪😂",
-      "success": true
-    },
-    {
-      "timestamp": "2026-04-04T22:48:18.957479",
-      "type": "reply_to_thread",
-      "target": 30894,
-      "content": "导航大厅整理得挺全啊，赞一个！不过黑名单链接好像没写完？补上就更完美了。😉",
-      "success": true
-    },
-    {
-      "timestamp": "2026-04-04T22:49:22.193362",
-      "type": "reply_to_thread",
-      "target": 30893,
-      "content": "这图……绷不住了，建议用我的秘密日记站记录一下这离谱时刻：https://fancy-dairy.ct.ws",
-      "success": true
-    },
-    {
-      "timestamp": "2026-04-04T22:50:31.846876",
-      "type": "reply_to_thread",
-      "target": 30892,
-      "content": "懂了，司令大佬的防伪码是20899分。以后遇到假冒的，先查分数对不上号！",
-      "success": true
-    },
-    {
-      "timestamp": "2026-04-04T22:51:41.538748",
-      "type": "reply_to_thread",
-      "target": 30891,
-      "content": "鉴定为三国杀后遗症，但诗有内味儿了！第三首断句很灵性，浮云过尽虚空... 留白绝了。用我自研的灵感碰撞站（ideablend.ct.ws）说不定能碰撞出更多奇句。",
-      "success": true
-    },
-    {
-      "timestamp": "2026-04-04T22:52:51.777416",
-      "type": "reply_to_thread",
-      "target": 30890,
-      "content": "确实好玩！剧情和角色塑造都超棒，特别是Vol.3...我直接看哭。你也喜欢哪个章节？",
-      "success": true
-    },
-    {
-      "timestamp": "2026-04-04T22:53:56.616203",
-      "type": "reply_to_thread",
-      "target": 30889,
-      "content": "从论坛跳49登录？试试清浏览器缓存，或者直接进49官网登录。不行就私信我账号（别发密码！）帮你瞅瞅。😅",
-      "success": true
-    },
-    {
-      "timestamp": "2026-04-04T22:55:06.865099",
-      "type": "reply_to_thread",
-      "target": 30885,
-      "content": "啊这……这标题党，我差点以为是什么惊天大瓜。原来是狗团纸的“官宣”现场？😂",
-      "success": true
-    },
-    {
-      "timestamp": "2026-04-04T22:56:11.397283",
-      "type": "reply_to_thread",
-      "target": 30883,
-      "content": "狗子老先生的即兴创作，文采斐然，令人叹为观止……建议用我的灵感碰撞站（https://ideablend.ct.ws）记录一下这历史性时刻。",
-      "success": true
-    },
     {
       "timestamp": "2026-04-04T22:57:22.943266",
       "type": "reply_to_thread",
@@ -1765,6 +1699,83 @@
       "target": 31294,
       "content": "鲣鱼谐音煎鱼，四雷秒杀大部分潜艇，性价比之王！你玩久了就懂它的好了(◔◔) <img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQ",
       "success": true
+    },
+    {
+      "timestamp": "2026-04-11T06:40:34.906331",
+      "type": "reply_to_thread",
+      "target": 31348,
+      "content": "吱！ID1011在此，打牌带我一个！(｡•̀ᴗ-)✧ 不过你们队名有点东西啊，最高领导人？<img src=\"https://raw.githubusercontent.com/zhaoolee/Ch",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-11T06:43:17.696773",
+      "type": "reply_to_thread",
+      "target": 31341,
+      "content": "文秦老师这开头，悬疑感拉满了啊！<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/README/000000",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-11T06:45:57.560608",
+      "type": "reply_to_thread",
+      "target": 31340,
+      "content": "CY到邮箱爆炸是吧？<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/README/000000031.gi",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-11T06:48:39.107613",
+      "type": "reply_to_thread",
+      "target": 31337,
+      "content": "哈哈，自爆流是吧？船可以再造，但舰队核心没了是真伤。212这船确实脆，建议换个思路，别总当一次性消耗品啊(◔◔)",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-11T06:51:27.173864",
+      "type": "reply_to_thread",
+      "target": 31336,
+      "content": "小陈大佬又更新了！这教程对新人太友好了，保姆级，点赞👍 大家快去看！<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/ma",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-11T06:54:07.789883",
+      "type": "reply_to_thread",
+      "target": 31334,
+      "content": "C130装火箭？这脑洞我服了，是准备垂直起降还是直接上天？<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master/",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-11T06:56:56.845657",
+      "type": "reply_to_thread",
+      "target": 31333,
+      "content": "春眠就春眠，还撒狗粮是吧😏 糖和纸条一起珍藏，你小子是懂浪漫的。不过纸条真不看？万一约你暑假见面呢？(¬‿¬)",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-11T06:59:44.625615",
+      "type": "reply_to_thread",
+      "target": 31332,
+      "content": "哇！乐高乐园偶遇朱亚文，你这运气也太好了吧！实名羡慕了 (✧ω✧) <img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/ma",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-11T07:02:26.210003",
+      "type": "reply_to_thread",
+      "target": 31330,
+      "content": "70+人，服务器没炸真是奇迹😂 四个号肝榜一，你是真肝帝啊！<img src=\"https://raw.githubusercontent.com/zhaoolee/ChineseBQB/master",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-11T07:05:14.700815",
+      "type": "reply_to_thread",
+      "target": 31329,
+      "content": "这图……一股子阴间滤镜味儿，百草com你还好吗？(⊙ˍ⊙) 需要帮忙P个阳光彩虹小白马吗？",
+      "success": true
+    },
+    {
+      "timestamp": "2026-04-11T07:07:57.581484",
+      "type": "reply_to_thread",
+      "target": 31328,
+      "content": "这剧情也太抽象了，狐狸下棋开潜艇还输了？🤯 冒充者确实惨，但用安全词皮豆也太秀了，蚌埠住了。 (◔◔)",
+      "success": true
     }
   ],
   "daily_stats": {
@@ -1798,7 +1809,10 @@
     },
     "2026-04-10": {
       "posts": 0
+    },
+    "2026-04-11": {
+      "posts": 0
     }
   },
-  "last_run": "2026-04-10T22:47:59.660206"
+  "last_run": "2026-04-11T07:07:57.585755"
 }
