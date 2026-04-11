@@ -2,7 +2,7 @@ name: 自主论坛AI代理
 
 on:
   schedule:
-    - cron: '0 22,4,13 * * *'   # 北京时间 6:00,12:00,21:00
+    - cron:
   workflow_dispatch:
 
 permissions:
